@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegReportX - Login</title>
+    <style>
+        /* Modern CSS Baseline and Variables for Enterprise Theme */
+        :root {
+            --primary-color: #0c2340;
+            /* Dark Blue */
+            --primary-hover: #153a66;
+            --background-color: #f4f6f8;
+            /* Light Grey */
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #d1d5db;
+            --error-color: #dc2626;
+            --focus-ring: rgba(12, 35, 64, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Container for vertical centering */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* Centered login card with subtle shadow and rounded corners */
+        .login-card {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 440px;
+            border-radius: 8px;
+            /* 8px rounded corners as requested */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 4px 10px rgba(0, 0, 0, 0.03);
+            padding: 2.5rem;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            font-size: 1.75rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .login-header p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        /* Form Controls Styling */
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+            background-color: #fff;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+
+        /* Custom styling for select to make it look consistent */
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            padding-right: 2.5rem;
+            cursor: pointer;
+        }
+
+        /* Error state for inputs */
+        .form-control.error-border {
+            border-color: var(--error-color);
+        }
+
+        .form-control.error-border:focus {
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+        }
+
+        /* Password Wrapper for Toggle Button */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper .form-control {
+            padding-right: 4rem;
+            /* Make room for the toggle button */
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary-color);
+        }
+
+        /* Error Messages */
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            display: none;
+            font-weight: 500;
+        }
+
+        /* Remember Me & Forgot Password */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .remember-me input {
+            margin-right: 0.5rem;
+            accent-color: var(--primary-color);
+            cursor: pointer;
+            width: 14px;
+            height: 14px;
+        }
+
+        .forgot-password {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+            color: var(--primary-hover);
+        }
+
+        /* Login Button */
+        .login-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.875rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 48px;
+        }
+
+        .login-btn:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+        }
+
+        .login-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        .login-btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Spinner Animation */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Footer Styling */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer p {
+            margin-bottom: 0.25rem;
+        }
+
+        /* Responsive adjustments for mobile devices */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 2rem 1.5rem;
+                border-radius: 0;
+                /* Optional edge-to-edge on very small screens, keeping 8px otherwise */
+                box-shadow: none;
+            }
+
+            .main-content {
+                padding: 0;
+                align-items: flex-start;
+                background-color: var(--card-bg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="main-content">
+        <div class="login-card">
+            <header class="login-header">
+                <h1>RegReportX</h1>
+                <p>Regulatory Reporting & Compliance System</p>
+            </header>
+
+            <form id="loginForm" novalidate>
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-control" name="email"
+                        placeholder="Enter your work email">
+                    <div class="error-message" id="emailError"></div>
+                </div>
+
+                <!-- Password Field with Toggle -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" class="form-control" name="password"
+                            placeholder="Enter your password">
+                        <button type="button" id="togglePassword" class="toggle-password">Show</button>
+                    </div>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+
+                <!-- Role Dropdown -->
+                <div class="form-group">
+                    <label for="role">Role</label>
+                    <select id="role" class="form-control" name="role">
+                        <option value="" disabled selected>Select your role</option>
+                        <option value="Compliance Analyst">Compliance Analyst</option>
+                        <option value="Risk Analyst">Risk Analyst</option>
+                        <option value="Reporting Officer">Reporting Officer</option>
+                        <option value="Operations Officer">Operations Officer</option>
+                        <option value="RegTech Admin">RegTech Admin</option>
+                    </select>
+                    <div class="error-message" id="roleError"></div>
+                </div>
+
+                <!-- Options: Remember Me & Forgot Password -->
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe"> Remember Me
+                    </label>
+                    <a href="#" class="forgot-password">Forgot Password?</a>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submitBtn" class="login-btn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="spinner" style="display: none;"></span>
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 RegReportX</p>
+        <p>Secure Regulatory Filing Platform</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const form = document.getElementById('loginForm');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const role = document.getElementById('role');
+            const togglePassword = document.getElementById('togglePassword');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const spinner = submitBtn.querySelector('.spinner');
+
+            // 1. Show/Hide Password Toggle
+            togglePassword.addEventListener('click', () => {
+                const isPassword = password.getAttribute('type') === 'password';
+                password.setAttribute('type', isPassword ? 'text' : 'password');
+                togglePassword.textContent = isPassword ? 'Hide' : 'Show';
+            });
+
+            // Utility to show inline errors
+            const showError = (elementId, message) => {
+                const errorElement = document.getElementById(elementId);
+                const inputElement = document.getElementById(elementId.replace('Error', ''));
+
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                inputElement.classList.add('error-border');
+            };
+
+            // Utility to clear inline errors
+            const clearError = (elementId) => {
+                const errorElement = document.getElementById(elementId);
+                const inputElement = document.getElementById(elementId.replace('Error', ''));
+
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+                inputElement.classList.remove('error-border');
+            };
+
+            // Regex for email validation
+            const validateEmailFormat = (val) => {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(String(val).toLowerCase());
+            };
+
+            // 2. Clear errors when the user starts typing/selecting
+            [email, password, role].forEach(el => {
+                el.addEventListener('input', () => clearError(el.id + 'Error'));
+                el.addEventListener('change', () => clearError(el.id + 'Error'));
+            });
+
+            // 3. Form Submission Handling
+            form.addEventListener('submit', (e) => {
+                e.preventDefault(); // Prevent default form action
+
+                let isValid = true;
+
+                // Clear all previous errors before re-validating
+                ['emailError', 'passwordError', 'roleError'].forEach(clearError);
+
+                // --- Email Validation ---
+                const emailValue = email.value.trim();
+                if (!emailValue) {
+                    showError('emailError', 'Email address is required.');
+                    isValid = false;
+                } else if (!validateEmailFormat(emailValue)) {
+                    showError('emailError', 'Please enter a valid email format.');
+                    isValid = false;
+                }
+
+                // --- Password Validation ---
+                const passwordValue = password.value;
+                if (!passwordValue) {
+                    showError('passwordError', 'Password is required.');
+                    isValid = false;
+                } else if (passwordValue.length < 8) {
+                    showError('passwordError', 'Password must be at least 8 characters long.');
+                    isValid = false;
+                }
+
+                // --- Role Validation ---
+                if (!role.value) {
+                    showError('roleError', 'Please select a reliable role for access.');
+                    isValid = false;
+                }
+
+                // --- On Successful Validation ---
+                if (isValid) {
+                    // Start loading spinner
+                    btnText.style.display = 'none';
+                    spinner.style.display = 'inline-block';
+                    submitBtn.disabled = true;
+
+                    // Simulate API Call / Login Process for 1.5 seconds
+                    setTimeout(() => {
+                        // Redirect based on selected role
+                        const selectedRole = role.value;
+                        if (selectedRole === 'Compliance Analyst') {
+                            window.location.href = 'compliance-dashboard.html';
+                        } else if (selectedRole === 'Risk Analyst') {
+                            window.location.href = 'risk-dashboard.html';
+                        } else if (selectedRole === 'Reporting Officer') {
+                            window.location.href = 'reporting-workspace.html';
+                        } else if (selectedRole === 'Operations Officer') {
+                            window.location.href = 'operations-console.html';
+                        } else if (selectedRole === 'RegTech Admin') {
+                            window.location.href = 'admin-panel.html';
+                        } else {
+                            window.location.href = 'dashboard.html';
+                        }
+                    }, 1500);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

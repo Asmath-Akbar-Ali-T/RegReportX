@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporting Officer Workspace - RegReportX</title>
+    <style>
+        :root {
+            --primary: #0c2340;
+            --primary-hover: #153a66;
+            --bg: #f4f6f8;
+            --card: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --brand: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+            --info: #3b82f6;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --transition: all 0.2s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 64px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1.5rem;
+            z-index: 50;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .logo {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.2rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-title {
+            color: var(--text-main);
+            font-weight: 600;
+            border-left: 1px solid var(--border);
+            padding-left: 1rem;
+            margin-left: 0.5rem;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            transition: var(--transition);
+            z-index: 40;
+            padding: 1.5rem 0;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: var(--bg);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            background: rgba(12, 35, 64, 0.05);
+            border-left-color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-top: 64px;
+            margin-left: 260px;
+            padding: 2rem;
+            transition: var(--transition);
+            width: calc(100% - 260px);
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* KPI Cards */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .kpi-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Flex Layouts */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+            margin-bottom: 2rem;
+        }
+
+        @media(max-width: 1024px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-header {
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        th {
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .row-hover:hover {
+            background: var(--bg);
+            cursor: pointer;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .s-draft {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .s-review {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .s-approved {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            border: 1px solid var(--primary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            background: transparent;
+            color: var(--primary);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-fill {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-fill:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Workflow Tracker */
+        .workflow {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 2rem 0;
+            padding: 0 1rem;
+        }
+
+        .workflow::before {
+            content: "";
+            position: absolute;
+            top: 12px;
+            left: 1rem;
+            right: 1rem;
+            height: 2px;
+            background: var(--border);
+            z-index: 1;
+        }
+
+        .step {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            width: 80px;
+        }
+
+        .step-circle {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: var(--card);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .step.active .step-circle {
+            border-color: var(--brand);
+            background: var(--brand);
+            color: white;
+        }
+
+        .step.done .step-circle {
+            border-color: var(--success);
+            background: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .step.active .step-label {
+            color: var(--brand);
+        }
+
+        /* Report Preview Panel */
+        .preview-panel {
+            display: none;
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .preview-panel.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Deadline List */
+        .deadline-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.85rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+        }
+
+        .deadline-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--primary);
+            margin-bottom: 0.2rem;
+        }
+
+        .deadline-date {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .countdown {
+            font-size: 0.85rem;
+            font-weight: 700;
+            background: var(--warning-bg);
+            color: var(--warning);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+        }
+
+        .urgent {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <button class="menu-btn" id="sidebarToggle">☰</button>
+            <a href="#" class="logo">RegReportX</a>
+            <span class="page-title">Reporting Officer Workspace</span>
+        </div>
+        <div class="nav-right">
+            <div class="profile">
+                <div class="avatar">RO</div>
+                <span style="font-size: 0.9rem; font-weight: 600;">R. Officer</span>
+                <button class="btn" style="margin-left: 1rem; border:none; color:var(--danger);"
+                    onclick="window.location.href='index.html'">Log Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <aside class="sidebar" id="sidebar">
+        <a href="#" class="nav-link active">Dashboard</a>
+        <a href="#" class="nav-link">Draft Reports</a>
+        <a href="#" class="nav-link">Validated Reports</a>
+        <a href="#" class="nav-link">Approved Reports</a>
+        <a href="#" class="nav-link">Filing History</a>
+        <div style="padding: 1rem 1.5rem; margin-top: 2rem;">
+            <button class="btn btn-fill" style="width: 100%;">+ Generate New Report</button>
+        </div>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+        <div class="kpi-row">
+            <div class="card">
+                <div class="kpi-title">Draft</div>
+                <div class="kpi-value">4</div>
+            </div>
+            <div class="card">
+                <div class="kpi-title">Under Review</div>
+                <div class="kpi-value" style="color:var(--warning);">2</div>
+            </div>
+            <div class="card">
+                <div class="kpi-title">Approved</div>
+                <div class="kpi-value" style="color:var(--success);">7</div>
+            </div>
+            <div class="card">
+                <div class="kpi-title">Filed (YTD)</div>
+                <div class="kpi-value">128</div>
+            </div>
+            <div class="card">
+                <div class="kpi-title">Rejected</div>
+                <div class="kpi-value" style="color:var(--danger);">1</div>
+            </div>
+        </div>
+
+        <div class="grid-layout">
+            <!-- Reports Section -->
+            <div>
+                <div class="card">
+                    <div class="section-header">Draft &amp; Pending Reports</div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Report ID</th>
+                                    <th>Template Name</th>
+                                    <th>Period</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="row-hover"
+                                    onclick="showPreview('REP-1102', 'RBI FORM A - LCR', 'Q3 2026', 'Draft')">
+                                    <td>REP-1102</td>
+                                    <td>RBI FORM A - LCR</td>
+                                    <td>Q3 2026</td>
+                                    <td><span class="status-badge s-draft" id="status-1102">Draft</span></td>
+                                    <td><button class="btn btn-fill"
+                                            onclick="event.stopPropagation(); validateReport('1102')">Validate</button>
+                                    </td>
+                                </tr>
+                                <tr class="row-hover"
+                                    onclick="showPreview('REP-1105', 'MAS 610 COREP', 'Oct 2026', 'Under Review')">
+                                    <td>REP-1105</td>
+                                    <td>MAS 610 COREP</td>
+                                    <td>Oct 2026</td>
+                                    <td><span class="status-badge s-review">Under Review</span></td>
+                                    <td><button class="btn">View</button></td>
+                                </tr>
+                                <tr class="row-hover"
+                                    onclick="showPreview('REP-1107', 'FCA PSD2', 'H1 2026', 'Approved')">
+                                    <td>REP-1107</td>
+                                    <td>FCA PSD2</td>
+                                    <td>H1 2026</td>
+                                    <td><span class="status-badge s-approved">Approved</span></td>
+                                    <td><button class="btn btn-fill"
+                                            style="background:var(--success); border-color:var(--success);">Submit
+                                            File</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Dynamic Preview Panel -->
+                    <div class="preview-panel" id="previewPanel">
+                        <div class="section-header"
+                            style="font-size:1rem; display:flex; justify-content:space-between;">
+                            <span id="pTitle">Report Preview</span>
+                            <button style="border:none; cursor:pointer;" onclick="closePreview()">✖</button>
+                        </div>
+
+                        <!-- Workflow Tracker -->
+                        <div class="workflow" id="workflowTracker">
+                            <div class="step done" id="step1">
+                                <div class="step-circle">✔</div>
+                                <div class="step-label">Draft</div>
+                            </div>
+                            <div class="step active" id="step2">
+                                <div class="step-circle">2</div>
+                                <div class="step-label">Review</div>
+                            </div>
+                            <div class="step" id="step3">
+                                <div class="step-circle">3</div>
+                                <div class="step-label">Approve</div>
+                            </div>
+                            <div class="step" id="step4">
+                                <div class="step-circle">4</div>
+                                <div class="step-label">File</div>
+                            </div>
+                        </div>
+
+                        <div class="info-grid">
+                            <div>
+                                <div class="info-label">Report ID</div>
+                                <div class="info-value" id="pId">-</div>
+                            </div>
+                            <div>
+                                <div class="info-label">Period</div>
+                                <div class="info-value" id="pPeriod">-</div>
+                            </div>
+                            <div>
+                                <div class="info-label">Template</div>
+                                <div class="info-value" id="pTemplate">-</div>
+                            </div>
+                            <div>
+                                <div class="info-label">Generated Date</div>
+                                <div class="info-value">Oct 26, 2026</div>
+                            </div>
+                        </div>
+
+                        <div class="action-row">
+                            <button class="btn" onclick="exportDoc('CSV')">Export CSV</button>
+                            <button class="btn" onclick="exportDoc('XML')">Export XML</button>
+                            <button class="btn btn-fill" id="actionBtnSubmit">Submit for Approval</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deadlines Sidebar -->
+            <div class="card">
+                <div class="section-header">Upcoming Deadlines</div>
+                <div class="deadline-item">
+                    <div>
+                        <div class="deadline-title">RBI FORM A - LCR</div>
+                        <div class="deadline-date">Due: Oct 28, 2026</div>
+                    </div>
+                    <div class="countdown urgent">2 Days</div>
+                </div>
+                <div class="deadline-item">
+                    <div>
+                        <div class="deadline-title">MAS 610 COREP</div>
+                        <div class="deadline-date">Due: Nov 05, 2026</div>
+                    </div>
+                    <div class="countdown">10 Days</div>
+                </div>
+                <div class="deadline-item">
+                    <div>
+                        <div class="deadline-title">FCA PSD2 File</div>
+                        <div class="deadline-date">Due: Nov 15, 2026</div>
+                    </div>
+                    <div class="countdown" style="background:#e0f2fe; color:#0284c7;">20 Days</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            &copy; 2026 RegReportX | Regulatory Filing Workspace
+        </div>
+    </main>
+
+    <script>
+        // Sidebar
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+
+        // Preview Logic
+        const previewPanel = document.getElementById('previewPanel');
+        function showPreview(id, template, period, status) {
+            document.getElementById('pId').textContent = id;
+            document.getElementById('pTemplate').textContent = template;
+            document.getElementById('pPeriod').textContent = period;
+            document.getElementById('pTitle').textContent = `Preview: ${template}`;
+
+            // Workflow reset
+            const steps = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3'), document.getElementById('step4')];
+            steps.forEach(s => s.className = 'step');
+
+            if (status === 'Draft') {
+                steps[0].className = 'step active';
+            } else if (status === 'Under Review') {
+                steps[0].className = 'step done'; steps[1].className = 'step active';
+            } else if (status === 'Approved') {
+                steps[0].className = 'step done'; steps[1].className = 'step done'; steps[2].className = 'step active';
+            }
+
+            previewPanel.classList.add('active');
+        }
+
+        function closePreview() {
+            previewPanel.classList.remove('active');
+        }
+
+        function validateReport(id) {
+            const badge = document.getElementById('status-' + id);
+            badge.className = 'status-badge s-review';
+            badge.textContent = 'Under Review';
+            alert(`Report REP-${id} successfully validated against central taxonomy engine and moved to 'Under Review'.`);
+            showPreview('REP-' + id, 'RBI FORM A - LCR', 'Q3 2026', 'Under Review');
+        }
+
+        function exportDoc(type) {
+            const id = document.getElementById('pId').textContent;
+            alert(`Generating ${type} package for ${id}... Download will begin shortly.`);
+        }
+
+        document.getElementById('actionBtnSubmit').addEventListener('click', function () {
+            const id = document.getElementById('pId').textContent;
+            this.textContent = 'Submitted!';
+            this.style.background = 'var(--success)';
+            this.style.borderColor = 'var(--success)';
+            alert(`${id} submitted for managerial approval. Notification dispatched.`);
+        });
+
+    </script>
+</body>
+
+</html>

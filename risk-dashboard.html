@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Analyst Dashboard - RegReportX</title>
+    <style>
+        :root {
+            --primary: #0c2340;
+            --primary-hover: #153a66;
+            --bg: #f4f6f8;
+            --card: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --info: #3b82f6;
+            --info-bg: #eff6ff;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --transition: all 0.2s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 64px;
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1.5rem;
+            z-index: 50;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .logo {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.2rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-title {
+            color: var(--text-main);
+            font-weight: 600;
+            border-left: 1px solid var(--border);
+            padding-left: 1rem;
+            margin-left: 0.5rem;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            font-size: 0.65rem;
+            padding: 0.1rem 0.3rem;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 120%;
+            right: 0;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+            display: none;
+            min-width: 150px;
+            flex-direction: column;
+        }
+
+        .dropdown.show {
+            display: flex;
+        }
+
+        .dropdown button {
+            padding: 0.75rem 1rem;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            width: 100%;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .dropdown button:hover {
+            background: var(--bg);
+            color: var(--primary);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            transition: var(--transition);
+            z-index: 40;
+            padding: 1.5rem 0;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--primary);
+            background: var(--bg);
+        }
+
+        .nav-link.active {
+            color: var(--primary);
+            background: rgba(12, 35, 64, 0.05);
+            border-left-color: var(--primary);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-top: 64px;
+            margin-left: 260px;
+            padding: 2rem;
+            transition: var(--transition);
+            width: calc(100% - 260px);
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Layout & Cards */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media(max-width: 1200px) {
+            .kpi-row {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media(max-width: 768px) {
+            .kpi-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .kpi-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-trend {
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--danger);
+        }
+
+        .trend-warn {
+            color: var(--warning);
+        }
+
+        /* Flex utilities */
+        .flex {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .flex-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .w-2 {
+            flex: 2;
+        }
+
+        .w-1 {
+            flex: 1;
+        }
+
+        /* Table Styles */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-control {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .input-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        select.input-control {
+            max-width: 200px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        th {
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: var(--bg);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-error {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .badge-success {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        /* Alerts List */
+        .alert-item {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .alert-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .alert-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .alert-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Simple Bar Chart */
+        .bar-chart-row {
+            margin-bottom: 1rem;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .bar-track {
+            width: 100%;
+            height: 8px;
+            background: var(--bg);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .req-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--text-main);
+            z-index: 2;
+        }
+
+        /* Stress Test Summary Grid */
+        .stress-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .stress-card {
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stress-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .stress-val {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <button class="menu-btn" id="sidebarToggle">☰</button>
+            <a href="#" class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 3v18h18"></path>
+                    <path d="M18 9l-5 5-3-3-4 4"></path>
+                </svg>
+                RegReportX
+            </a>
+            <span class="page-title">Risk Analyst Dashboard</span>
+        </div>
+        <div class="nav-right">
+            <button class="icon-btn" title="Alerts"><span class="badge">2</span>🔔</button>
+            <div class="profile" id="profileToggle">
+                <div class="avatar">RA</div>
+                <span style="font-size: 0.9rem; font-weight: 600;">R. Analyst</span>
+                <div class="dropdown" id="profileDropdown">
+                    <button style="color: var(--danger);" id="logoutBtn">Log Out</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <aside class="sidebar" id="sidebar">
+        <a href="#" class="nav-link active">Dashboard</a>
+        <a href="#" class="nav-link">Capital Adequacy</a>
+        <a href="#" class="nav-link">Liquidity Metrics (LCR / NSFR)</a>
+        <a href="#" class="nav-link">Exposure Analysis</a>
+        <a href="#" class="nav-link">RWA Calculations</a>
+        <a href="#" class="nav-link">Stress Testing Results</a>
+        <a href="#" class="nav-link">Historical Reports</a>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+        <div class="kpi-row">
+            <div class="card">
+                <div class="kpi-title">Total RWA</div>
+                <div class="kpi-value">$45.2B</div>
+                <div class="kpi-trend trend-down">▼ 1.2% from prev quarter</div>
+            </div>
+            <div class="card">
+                <div class="kpi-title">CET1 Ratio</div>
+                <div class="kpi-value" style="color: var(--success);">14.8%</div>
+                <div class="kpi-trend trend-up">▲ 0.3% well above 4.5% min</div>
+            </div>
+            <div class="card">
+                <div class="kpi-title">Total Capital Ratio</div>
+                <div class="kpi-value" style="color: var(--success);">18.2%</div>
+                <div class="kpi-trend trend-up">▲ 0.5% well above 8.0% min</div>
+            </div>
+            <div class="card">
+                <div class="kpi-title">Liquidity Coverage Ratio (LCR)</div>
+                <div class="kpi-value" style="color: var(--warning);">115%</div>
+                <div class="kpi-trend trend-down">▼ 5% nearing 100% threshold</div>
+            </div>
+            <div class="card">
+                <div class="kpi-title">Net Stable Funding Ratio (NSFR)</div>
+                <div class="kpi-value" style="color: var(--success);">122%</div>
+                <div class="kpi-trend trend-up">▲ 2% secure funding baseline</div>
+            </div>
+        </div>
+
+        <div class="flex">
+            <!-- Exposures Table -->
+            <div class="card w-2">
+                <div class="section-header">
+                    <h2 class="section-title">Exposure Analysis</h2>
+                </div>
+                <div class="table-controls">
+                    <input type="text" id="searchExposure" class="input-control"
+                        placeholder="Search Counterparty ID...">
+                    <select id="riskFilter" class="input-control">
+                        <option value="All">All Risk Categories</option>
+                        <option value="High">High Risk</option>
+                        <option value="Medium">Medium Risk</option>
+                        <option value="Low">Low Risk</option>
+                    </select>
+                </div>
+                <div class="table-wrapper">
+                    <table id="exposureTable">
+                        <thead>
+                            <tr>
+                                <th>Counterparty ID</th>
+                                <th>EAD ($M)</th>
+                                <th>LGD (%)</th>
+                                <th>PD (%)</th>
+                                <th>Risk Weight</th>
+                                <th>Exposure Type</th>
+                                <th>Risk Category</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-risk="High">
+                                <td>CP-9031 (Corp A)</td>
+                                <td>$450.0</td>
+                                <td>45%</td>
+                                <td>2.5%</td>
+                                <td>150%</td>
+                                <td>Corporate Loan</td>
+                                <td><span class="status-badge badge-error">High</span></td>
+                            </tr>
+                            <tr data-risk="Medium">
+                                <td>CP-8110 (Muni B)</td>
+                                <td>$125.5</td>
+                                <td>20%</td>
+                                <td>0.5%</td>
+                                <td>50%</td>
+                                <td>Municipal Bond</td>
+                                <td><span class="status-badge badge-warning">Medium</span></td>
+                            </tr>
+                            <tr data-risk="Low">
+                                <td>CP-7221 (Gov C)</td>
+                                <td>$2,100.0</td>
+                                <td>0%</td>
+                                <td>0.0%</td>
+                                <td>0%</td>
+                                <td>Sovereign Debt</td>
+                                <td><span class="status-badge badge-success">Low</span></td>
+                            </tr>
+                            <tr data-risk="High">
+                                <td>CP-6044 (Bank D)</td>
+                                <td>$320.0</td>
+                                <td>55%</td>
+                                <td>1.8%</td>
+                                <td>100%</td>
+                                <td>OTC Derivative</td>
+                                <td><span class="status-badge badge-error">High</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="w-1 flex-col">
+                <!-- Large Exposure Alerts -->
+                <div class="card">
+                    <h2 class="section-title" style="margin-bottom: 1rem;">Large Exposure Alerts</h2>
+                    <div class="alert-item" style="border-left: 4px solid var(--danger);">
+                        <div class="alert-info">
+                            <span class="alert-name">CP-9031 (Corp A)</span>
+                            <span class="alert-desc">Exposure: $450M | Limit: $400M</span>
+                        </div>
+                        <span class="status-badge badge-error">Breach</span>
+                    </div>
+                    <div class="alert-item" style="border-left: 4px solid var(--warning);">
+                        <div class="alert-info">
+                            <span class="alert-name">CP-8110 (Muni B)</span>
+                            <span class="alert-desc">Exposure: $125.5M | Limit: $150M</span>
+                        </div>
+                        <span class="status-badge badge-warning">Near Limit</span>
+                    </div>
+                </div>
+
+                <!-- Capital Ratio Chart Mock -->
+                <div class="card">
+                    <h2 class="section-title" style="margin-bottom: 1rem;">Capital Ratio vs Requirement</h2>
+
+                    <div class="bar-chart-row">
+                        <div class="bar-label">
+                            <span>CET1 Ratio</span>
+                            <span style="color: var(--success);">14.8%</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: 74%; background: var(--success);"></div>
+                            <div class="req-line" style="left: 22.5%;" title="Min Requirement: 4.5%"></div>
+                        </div>
+                        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">Req: 4.5%</div>
+                    </div>
+
+                    <div class="bar-chart-row">
+                        <div class="bar-label">
+                            <span>Tier 1 Capital</span>
+                            <span style="color: var(--success);">16.1%</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: 80.5%; background: var(--success);"></div>
+                            <div class="req-line" style="left: 30%;" title="Min Requirement: 6.0%"></div>
+                        </div>
+                        <div style="font-size:0.7rem; color:var(--text-muted); margin-top:2px;">Req: 6.0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stress Testing Summary -->
+        <div class="card">
+            <h2 class="section-title" style="margin-bottom: 1rem;">Stress Testing Results (Projected CET1)</h2>
+            <div class="stress-grid">
+                <div class="stress-card">
+                    <div class="stress-title">Base Scenario (Current)</div>
+                    <div class="stress-val">14.8%</div>
+                </div>
+                <div class="stress-card">
+                    <div class="stress-title">Moderate Stress (Historical)</div>
+                    <div class="stress-val" style="color: var(--warning);">11.2%</div>
+                </div>
+                <div class="stress-card">
+                    <div class="stress-title">Severe Stress (Adverse)</div>
+                    <div class="stress-val" style="color: var(--danger);">7.4%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            &copy; 2026 RegReportX | Risk Supervisory Module
+        </div>
+    </main>
+
+    <script>
+        // Sidebar Toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+
+        // Profile Dropdown
+        const profileToggle = document.getElementById('profileToggle');
+        const profileDropdown = document.getElementById('profileDropdown');
+
+        profileToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileDropdown.classList.toggle('show');
+        });
+
+        document.addEventListener('click', () => {
+            profileDropdown.classList.remove('show');
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        // Filter Logic
+        const searchInput = document.getElementById('searchExposure');
+        const riskFilter = document.getElementById('riskFilter');
+        const tableRows = document.querySelectorAll('#exposureTable tbody tr');
+
+        function filterTable() {
+            const searchVal = searchInput.value.toLowerCase();
+            const filterVal = riskFilter.value;
+
+            tableRows.forEach(row => {
+                const text = row.cells[0].textContent.toLowerCase();
+                const risk = row.getAttribute('data-risk');
+
+                const matchesSearch = text.includes(searchVal);
+                const matchesRisk = filterVal === 'All' || risk === filterVal;
+
+                if (matchesSearch && matchesRisk) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        riskFilter.addEventListener('change', filterTable);
+    </script>
+</body>
+
+</html>

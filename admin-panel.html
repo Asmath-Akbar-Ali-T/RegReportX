@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RegTech Admin Panel - RegReportX</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --primary-hover: #1e293b;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --brand: #3b82f6;
+            --brand-light: #eff6ff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.2s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background: var(--primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1.5rem;
+            z-index: 50;
+            color: white;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .logo {
+            font-weight: 700;
+            color: white;
+            font-size: 1.2rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-title {
+            font-weight: 600;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            padding-left: 1rem;
+            margin-left: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-outline-light {
+            padding: 0.3rem 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: white;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            bottom: 0;
+            width: 250px;
+            background: #ffffff;
+            border-right: 1px solid var(--border);
+            transition: var(--transition);
+            z-index: 40;
+            padding: 1rem 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.85rem 1.5rem;
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: var(--bg);
+            color: var(--brand);
+        }
+
+        .nav-link.active {
+            background: var(--brand-light);
+            color: var(--brand);
+            border-left-color: var(--brand);
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-top: 60px;
+            margin-left: 250px;
+            padding: 2rem;
+            transition: var(--transition);
+            width: calc(100% - 250px);
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+            width: 100%;
+        }
+
+        /* Layout & Cards */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .kpi-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-val {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .flex-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+            margin-bottom: 2rem;
+        }
+
+        @media(max-width: 1200px) {
+            .flex-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-header {
+            font-size: 1.05rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            border-bottom: 2px solid var(--bg);
+            padding-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Tables */
+        .table-wrap {
+            overflow-x: auto;
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.85rem;
+        }
+
+        th {
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background: var(--bg);
+        }
+
+        .badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .b-succ {
+            background: #ecfdf5;
+            color: var(--success);
+            border: 1px solid #a7f3d0;
+        }
+
+        .b-fail {
+            background: #fef2f2;
+            color: var(--danger);
+            border: 1px solid #fecaca;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            background: white;
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 2px var(--brand-light);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--brand);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg);
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 34px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--success);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(14px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <button class="menu-btn" id="sidebarToggle">☰</button>
+            <a href="#" class="logo">RegReportX</a>
+            <span class="page-title">RegTech Admin Panel</span>
+        </div>
+        <div class="nav-right">
+            <span>Welcome, Admin</span>
+            <button class="btn-outline-light" onclick="window.location.href='index.html'">Log Out</button>
+        </div>
+    </nav>
+
+    <aside class="sidebar" id="sidebar">
+        <a href="#" class="nav-link active">Dashboard Overview</a>
+        <a href="#" class="nav-link">User Management</a>
+        <a href="#" class="nav-link">Role Management</a>
+        <a href="#" class="nav-link">Regulatory Templates</a>
+        <a href="#" class="nav-link">Validation Rules Engine</a>
+        <a href="#" class="nav-link">Scheduling & Frequency</a>
+        <a href="#" class="nav-link">Audit Logs</a>
+        <a href="#" class="nav-link">System Configuration</a>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+
+        <div class="kpi-row">
+            <div class="card">
+                <div class="kpi-title">Total Users</div>
+                <div class="kpi-val">248</div>
+            </div>
+            <div class="card">
+                <div class="kpi-title">Active Rules</div>
+                <div class="kpi-val">1,824</div>
+            </div>
+            <div class="card">
+                <div class="kpi-title">Active Templates</div>
+                <div class="kpi-val">42</div>
+            </div>
+            <div class="card">
+                <div class="kpi-title">Scheduled Reports</div>
+                <div class="kpi-val">86</div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 2rem;">
+            <div class="section-header">
+                <div>User Management</div>
+                <button class="btn btn-primary" onclick="alert('Open Add User Modal')">+ Add User</button>
+            </div>
+            <div class="table-wrap">
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>U-1004</td>
+                            <td>Samantha Risk</td>
+                            <td>Risk Analyst</td>
+                            <td>s.risk@bank.com</td>
+                            <td><span class="badge b-succ">Active</span></td>
+                            <td><button class="btn btn-outline" style="padding:0.25rem 0.5rem;"
+                                    onclick="toggleUserStatus('U-1004')">Suspend</button></td>
+                        </tr>
+                        <tr>
+                            <td>U-1011</td>
+                            <td>Michael Compliance</td>
+                            <td>Compliance Analyst</td>
+                            <td>m.comp@bank.com</td>
+                            <td><span class="badge b-succ">Active</span></td>
+                            <td><button class="btn btn-outline" style="padding:0.25rem 0.5rem;"
+                                    onclick="toggleUserStatus('U-1011')">Suspend</button></td>
+                        </tr>
+                        <tr>
+                            <td>U-1025</td>
+                            <td>David Ops</td>
+                            <td>Operations Officer</td>
+                            <td>d.ops@bank.com</td>
+                            <td><span class="badge b-fail">Inactive</span></td>
+                            <td><button class="btn btn-outline" style="padding:0.25rem 0.5rem;"
+                                    onclick="toggleUserStatus('U-1025')">Activate</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="flex-row">
+
+            <!-- Regulatory Template Configuration -->
+            <div class="card">
+                <div class="section-header">Regulatory Template Setup</div>
+                <div class="form-group">
+                    <label class="form-label">Regulation Code / Template Name</label>
+                    <input type="text" class="form-input" id="regCode" placeholder="e.g. MAS 610, RBI LCR">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-input" id="regDesc" placeholder="Brief template description">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Default Frequency</label>
+                    <select class="form-select">
+                        <option>Daily</option>
+                        <option>Weekly</option>
+                        <option>Monthly</option>
+                        <option>Quarterly</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:flex; justify-content:space-between; align-items:center;">
+                    <label class="form-label" style="margin:0;">Active Status</label>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <button class="btn btn-primary" style="width:100%;" onclick="saveTemplate()">Save Template
+                    Module</button>
+            </div>
+
+            <!-- Validation Rule Builder -->
+            <div class="card">
+                <div class="section-header">Validation Rule Engine</div>
+                <div class="form-group">
+                    <label class="form-label">Rule Name/ID</label>
+                    <input type="text" class="form-input" id="ruleName" placeholder="e.g. VAL-R042.A">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Rule Expression (SQL / Python Dialect)</label>
+                    <input type="text" class="form-input" style="font-family:monospace;"
+                        placeholder="e.g. IF sum(row) != abs(col) THEN ...">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Severity Map</label>
+                    <select class="form-select">
+                        <option>Error (Blocks Filing)</option>
+                        <option>Warning (Flags for Review)</option>
+                        <option>Info (Audit Only)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:flex; justify-content:space-between; align-items:center;">
+                    <label class="form-label" style="margin:0;">Enable Rule</label>
+                    <label class="switch">
+                        <input type="checkbox" checked onchange="toggleRule(this)">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <button class="btn btn-outline" style="width:100%;"
+                    onclick="alert('Rule saved to dictionary successfully.')">Push to Engine</button>
+            </div>
+
+        </div>
+
+        <div class="flex-row">
+            <!-- Scheduler -->
+            <div class="card">
+                <div class="section-header">Scheduling Configuration</div>
+                <div class="form-group">
+                    <label class="form-label">Target Template</label>
+                    <select class="form-select">
+                        <option>RBI FORM A - LCR</option>
+                        <option>FED FR Y-9C</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:flex; gap:1rem;">
+                    <div style="flex:1;">
+                        <label class="form-label">Trigger Time (UTC)</label>
+                        <input type="time" class="form-input" value="05:00">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="scheduleReport()">Update Schedule</button>
+                <div class="form-group" style="margin-top:1rem;">
+                    <span id="schedStatus" style="font-size:0.8rem; color:var(--success);">Next run dynamically set to:
+                        Tomorrow 05:00 UTC</span>
+                </div>
+            </div>
+
+            <!-- Audit Logs -->
+            <div class="card">
+                <div class="section-header">System Event Audit Trial (Live View)</div>
+                <div class="table-wrap" style="max-height: 250px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Timestamp</th>
+                                <th>Resource</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditTable">
+                            <tr>
+                                <td>System_Engine</td>
+                                <td>Ingest Batch Execute</td>
+                                <td>10:45:01 AM</td>
+                                <td>Batch B-9021</td>
+                            </tr>
+                            <tr>
+                                <td>O-Ops_User</td>
+                                <td>Override Metric</td>
+                                <td>10:42:15 AM</td>
+                                <td>FED-Y9C-RWA</td>
+                            </tr>
+                            <tr>
+                                <td>Admin_Root</td>
+                                <td>Modify Rule</td>
+                                <td>09:12:05 AM</td>
+                                <td>Rule VAL-R042</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 1.5rem 0;">
+            &copy; 2026 RegReportX | Administrative Control Panel
+        </div>
+    </main>
+
+    <script>
+        // Sidebar
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+
+        function toggleUserStatus(id) {
+            alert(`User ${id} status toggled in the IAM module.`);
+        }
+
+        function saveTemplate() {
+            const code = document.getElementById('regCode').value;
+            if (!code) {
+                alert('Please enter a Regulation Code first.'); return;
+            }
+            logAudit('Create Template', code);
+            alert(`Template ${code} saved to taxonomy framework.`);
+            document.getElementById('regCode').value = '';
+            document.getElementById('regDesc').value = '';
+        }
+
+        function toggleRule(box) {
+            logAudit('Toggle Rule State', 'Runtime Engine');
+        }
+
+        function scheduleReport() {
+            logAudit('Update Schedule', 'Cron Tab Setup');
+            const status = document.getElementById('schedStatus');
+            status.style.opacity = '0';
+            setTimeout(() => {
+                status.innerText = `Configuration pushed to scheduler node.`;
+                status.style.opacity = '1';
+            }, 300);
+        }
+
+        function logAudit(action, resource) {
+            const tbody = document.getElementById('auditTable');
+            const row = document.createElement('tr');
+            const time = new Date().toLocaleTimeString('en-US');
+            row.innerHTML = `<td>Admin_Session</td><td>${action}</td><td>${time}</td><td>${resource}</td>`;
+            tbody.insertBefore(row, tbody.firstChild);
+        }
+    </script>
+</body>
+
+</html>
