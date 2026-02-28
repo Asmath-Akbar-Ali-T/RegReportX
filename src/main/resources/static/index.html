@@ -275,10 +275,141 @@
                 background-color: var(--card-bg);
             }
         }
+
+        /* --- Enterprise Toast Notification System --- */
+        .toast-container {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            pointer-events: none;
+            /* Let clicks pass through empty space */
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            min-width: 320px;
+            max-width: 420px;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.08);
+            /* Subtle premium shadow */
+            border-radius: 8px;
+            /* 8px rounded corners */
+            border-left: 4px solid var(--primary-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+            transform: translateX(120%);
+            opacity: 0;
+            animation: slideIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            /* Smooth modern slide-in */
+            pointer-events: auto;
+            /* Re-enable clicks on the toast itself */
+            overflow: hidden;
+        }
+
+        .toast.hiding {
+            animation: slideOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            to {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.25rem;
+            line-height: 1;
+            padding: 0;
+            margin-left: 1rem;
+            transition: color 0.2s ease;
+        }
+
+        .toast-close:hover {
+            color: var(--text-main);
+        }
+
+        /* Toast Themes mapping to prompt requirements */
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        /* Green */
+        .toast.error {
+            border-left-color: #ef4444;
+        }
+
+        /* Red (User not found) */
+        .toast.warning {
+            border-left-color: #f97316;
+        }
+
+        /* Orange (Invalid password) */
+        .toast.info {
+            border-left-color: #8b5cf6;
+        }
+
+        /* Purple (Invalid role) */
+        .toast.inactive {
+            border-left-color: #6b7280;
+        }
+
+        /* Grey (Inactive account) */
+        .toast.network {
+            border-left-color: #991b1b;
+        }
+
+        /* Dark Red (Network error) */
+
+        .toast-icon {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        /* Success toast small spinner */
+        .toast-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            border-radius: 50%;
+            border-top-color: #10b981;
+            animation: spin 0.8s linear infinite;
+        }
     </style>
 </head>
 
 <body>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <main class="main-content">
         <div class="login-card">
@@ -312,11 +443,11 @@
                     <label for="role">Role</label>
                     <select id="role" class="form-control" name="role">
                         <option value="" disabled selected>Select your role</option>
-                        <option value="Compliance Analyst">Compliance Analyst</option>
-                        <option value="Risk Analyst">Risk Analyst</option>
-                        <option value="Reporting Officer">Reporting Officer</option>
-                        <option value="Operations Officer">Operations Officer</option>
-                        <option value="RegTech Admin">RegTech Admin</option>
+                        <option value="COMPLIANCE_ANALYST">Compliance Analyst</option>
+                        <option value="RISK_ANALYST">Risk Analyst</option>
+                        <option value="REPORTING_OFFICER">Reporting Officer</option>
+                        <option value="OPERATIONS_OFFICER">Operations Officer</option>
+                        <option value="REGTECH_ADMIN">RegTech Admin</option>
                     </select>
                     <div class="error-message" id="roleError"></div>
                 </div>
@@ -396,67 +527,129 @@
             });
 
             // 3. Form Submission Handling
-            form.addEventListener('submit', (e) => {
-                e.preventDefault(); // Prevent default form action
+            document.querySelector("form").addEventListener("submit", async function (e) {
+                e.preventDefault();
 
-                let isValid = true;
+                const emailValue = document.getElementById("email").value;
+                const passwordValue = document.getElementById("password").value;
+                const roleValue = document.getElementById("role").value;
 
-                // Clear all previous errors before re-validating
-                ['emailError', 'passwordError', 'roleError'].forEach(clearError);
+                // Disable button and show form spinner during fetch
+                btnText.style.display = 'none';
+                spinner.style.display = 'inline-block';
+                submitBtn.disabled = true;
 
-                // --- Email Validation ---
-                const emailValue = email.value.trim();
-                if (!emailValue) {
-                    showError('emailError', 'Email address is required.');
-                    isValid = false;
-                } else if (!validateEmailFormat(emailValue)) {
-                    showError('emailError', 'Please enter a valid email format.');
-                    isValid = false;
-                }
+                try {
+                    const response = await fetch("http://localhost:9090/api/login", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ email: emailValue, password: passwordValue, role: roleValue })
+                    });
 
-                // --- Password Validation ---
-                const passwordValue = password.value;
-                if (!passwordValue) {
-                    showError('passwordError', 'Password is required.');
-                    isValid = false;
-                } else if (passwordValue.length < 8) {
-                    showError('passwordError', 'Password must be at least 8 characters long.');
-                    isValid = false;
-                }
+                    const data = await response.json();
 
-                // --- Role Validation ---
-                if (!role.value) {
-                    showError('roleError', 'Please select a reliable role for access.');
-                    isValid = false;
-                }
+                    if (response.ok) {
+                        localStorage.setItem("userRole", data.role);
+                        showToast('success', 'Login successful. Redirecting...');
 
-                // --- On Successful Validation ---
-                if (isValid) {
-                    // Start loading spinner
-                    btnText.style.display = 'none';
-                    spinner.style.display = 'inline-block';
-                    submitBtn.disabled = true;
+                        setTimeout(() => {
+                            if (data.role === "REGTECH_ADMIN")
+                                window.location.href = "admin-panel.html";
+                            else if (data.role === "COMPLIANCE_ANALYST")
+                                window.location.href = "compliance-dashboard.html";
+                            else if (data.role === "RISK_ANALYST")
+                                window.location.href = "risk-dashboard.html";
+                            else if (data.role === "REPORTING_OFFICER")
+                                window.location.href = "reporting-workspace.html";
+                            else if (data.role === "OPERATIONS_OFFICER")
+                                window.location.href = "operations-console.html";
+                            else
+                                window.location.href = "dashboard.html";
+                        }, 1500);
 
-                    // Simulate API Call / Login Process for 1.5 seconds
-                    setTimeout(() => {
-                        // Redirect based on selected role
-                        const selectedRole = role.value;
-                        if (selectedRole === 'Compliance Analyst') {
-                            window.location.href = 'compliance-dashboard.html';
-                        } else if (selectedRole === 'Risk Analyst') {
-                            window.location.href = 'risk-dashboard.html';
-                        } else if (selectedRole === 'Reporting Officer') {
-                            window.location.href = 'reporting-workspace.html';
-                        } else if (selectedRole === 'Operations Officer') {
-                            window.location.href = 'operations-console.html';
-                        } else if (selectedRole === 'RegTech Admin') {
-                            window.location.href = 'admin-panel.html';
+                    } else {
+                        // Reset button state immediately on error
+                        btnText.style.display = 'inline-block';
+                        spinner.style.display = 'none';
+                        submitBtn.disabled = false;
+
+                        // Clear any previous error borders
+                        ['email', 'password', 'role'].forEach(id => {
+                            document.getElementById(id).classList.remove('error-border');
+                        });
+
+                        // Different UI styles based on error type according to requirements
+                        // and highlight the specific field where the user made the mistake
+                        const errorMsg = data.error || data.message || "Unknown error";
+                        if (errorMsg.includes("not found")) {
+                            document.getElementById("email").classList.add('error-border');
+                            showToast('error', 'No account found with this email.', '❌');
+                            document.getElementById("email").focus();
+                        } else if (errorMsg.includes("password")) {
+                            document.getElementById("password").classList.add('error-border');
+                            showToast('warning', 'Incorrect password. Please try again.', '⚠️');
+                            document.getElementById("password").focus();
+                            document.getElementById("password").value = ''; // clear password
+                        } else if (errorMsg.includes("role")) {
+                            document.getElementById("role").classList.add('error-border');
+                            showToast('info', 'Selected role does not match this account.', 'ℹ️');
+                            document.getElementById("role").focus();
+                        } else if (errorMsg.includes("inactive")) {
+                            showToast('inactive', 'Your account is currently inactive. Contact administrator.', '🔒');
                         } else {
-                            window.location.href = 'dashboard.html';
+                            showToast('error', errorMsg, '❌');
                         }
-                    }, 1500);
+                    }
+                } catch (error) {
+                    btnText.style.display = 'inline-block';
+                    spinner.style.display = 'none';
+                    submitBtn.disabled = false;
+
+                    showToast('network', 'Unable to connect to server. Please try later.', '🔌');
                 }
             });
+
+            // Enterprise Modular Toast Function
+            window.showToast = function (type, message, customIcon = '') {
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
+
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+
+                // Set appropriate icon based on type (success gets a spinner, others get emojis/icons)
+                let iconHtml = customIcon ? `<span>${customIcon}</span>` : '';
+                if (type === 'success') {
+                    iconHtml = '<div class="toast-spinner"></div>';
+                }
+
+                toast.innerHTML = `
+                    <div class="toast-content">
+                        <div class="toast-icon">${iconHtml}</div>
+                        <div>${message}</div>
+                    </div>
+                    <button class="toast-close" aria-label="Close">&times;</button>
+                `;
+
+                // Setup close interaction
+                toast.querySelector('.toast-close').addEventListener('click', () => {
+                    closeToast(toast);
+                });
+
+                container.appendChild(toast);
+
+                // Auto-remove after 4 seconds
+                setTimeout(() => closeToast(toast), 4000);
+            };
+
+            // Helper to smoothly slide out and remove toast
+            function closeToast(toast) {
+                if (toast.classList.contains('hiding')) return; // Prevent double trigger
+                toast.classList.add('hiding');
+                toast.addEventListener('animationend', () => toast.remove());
+            }
         });
     </script>
 </body>
