@@ -548,9 +548,8 @@
                         body: JSON.stringify({ email: emailValue, password: passwordValue, role: roleValue })
                     });
 
-                    const data = await response.json();
-
                     if (response.ok) {
+                        const data = await response.json();
                         localStorage.setItem("userRole", data.role);
                         showToast('success', 'Login successful. Redirecting...');
 
@@ -570,6 +569,9 @@
                         }, 1500);
 
                     } else {
+                        // Backend returns plain text strings for errors
+                        const errorMsg = await response.text();
+
                         // Reset button state immediately on error
                         btnText.style.display = 'inline-block';
                         spinner.style.display = 'none';
@@ -582,24 +584,23 @@
 
                         // Different UI styles based on error type according to requirements
                         // and highlight the specific field where the user made the mistake
-                        const errorMsg = data.error || data.message || "Unknown error";
-                        if (errorMsg.includes("not found")) {
+                        if (errorMsg.includes("User not found")) {
                             document.getElementById("email").classList.add('error-border');
                             showToast('error', 'No account found with this email.', '❌');
                             document.getElementById("email").focus();
-                        } else if (errorMsg.includes("password")) {
+                        } else if (errorMsg.includes("Invalid password")) {
                             document.getElementById("password").classList.add('error-border');
                             showToast('warning', 'Incorrect password. Please try again.', '⚠️');
                             document.getElementById("password").focus();
                             document.getElementById("password").value = ''; // clear password
-                        } else if (errorMsg.includes("role")) {
+                        } else if (errorMsg.includes("Invalid role selected")) {
                             document.getElementById("role").classList.add('error-border');
                             showToast('info', 'Selected role does not match this account.', 'ℹ️');
                             document.getElementById("role").focus();
-                        } else if (errorMsg.includes("inactive")) {
+                        } else if (errorMsg.includes("User inactive")) {
                             showToast('inactive', 'Your account is currently inactive. Contact administrator.', '🔒');
                         } else {
-                            showToast('error', errorMsg, '❌');
+                            showToast('error', errorMsg || "Unknown error", '❌');
                         }
                     }
                 } catch (error) {
