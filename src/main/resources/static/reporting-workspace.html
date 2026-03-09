@@ -4,718 +4,804 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporting Officer Workspace - RegReportX</title>
+    <title>Reporting Officer - RegReportX (RBI)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #0c2340;
-            --primary-hover: #153a66;
-            --bg: #f4f6f8;
-            --card: #ffffff;
+            --primary-color: #0c2340;
+            --primary-light: #1a3a66;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --bg-color: #f3f4f6;
+            --sidebar-bg: #0c2340;
+            --card-bg: #ffffff;
             --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --border: #e5e7eb;
-            --brand: #2563eb;
-            --success: #10b981;
+            --text-light: #6b7280;
+            --border-color: #e5e7eb;
+            --danger: #ef4444;
             --warning: #f59e0b;
-            --danger: #dc2626;
-            --info: #3b82f6;
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            --transition: all 0.2s ease;
+            --purple: #8b5cf6;
+            --sidebar-width: 280px;
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            background: var(--bg);
+            background-color: var(--bg-color);
             color: var(--text-main);
             display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* Navbar */
-        .navbar {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 64px;
-            background: var(--card);
-            border-bottom: 1px solid var(--border);
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: white;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 1.5rem;
-            z-index: 50;
+            flex-direction: column;
+            height: 100%;
+            transition: all 0.3s;
+            z-index: 100;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .nav-left {
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             gap: 1rem;
         }
 
-        .menu-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-size: 1.2rem;
-        }
-
-        .logo {
+        .sidebar-header h2 {
+            font-size: 1.25rem;
             font-weight: 700;
-            color: var(--primary);
-            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 0;
+            list-style: none;
+        }
+
+        .menu-item {
+            padding: 0 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            color: #cbd5e1;
             text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s;
         }
 
-        .page-title {
-            color: var(--text-main);
-            font-weight: 600;
-            border-left: 1px solid var(--border);
-            padding-left: 1rem;
-            margin-left: 0.5rem;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-        }
-
-        .profile {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .avatar {
-            width: 32px;
-            height: 32px;
-            background: var(--primary);
+        .menu-link:hover,
+        .menu-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
             color: white;
-            border-radius: 50%;
+        }
+
+        .menu-link i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            color: var(--danger);
+        }
+
+        .generate-btn {
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 0.75rem;
+            width: 100%;
+            padding: 0.875rem;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
             font-weight: 600;
-            font-size: 0.85rem;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            transition: background 0.2s;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
         }
 
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 64px;
-            left: 0;
-            bottom: 0;
-            width: 260px;
-            background: var(--card);
-            border-right: 1px solid var(--border);
-            transition: var(--transition);
-            z-index: 40;
-            padding: 1.5rem 0;
-        }
-
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-
-        .nav-link {
-            display: block;
-            padding: 0.75rem 1.5rem;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            border-left: 3px solid transparent;
-        }
-
-        .nav-link:hover {
-            color: var(--primary);
-            background: var(--bg);
-        }
-
-        .nav-link.active {
-            color: var(--primary);
-            background: rgba(12, 35, 64, 0.05);
-            border-left-color: var(--primary);
+        .generate-btn:hover {
+            background-color: #2563eb;
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-top: 64px;
-            margin-left: 260px;
-            padding: 2rem;
-            transition: var(--transition);
-            width: calc(100% - 260px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--bg-color);
         }
 
-        .main-content.expanded {
-            margin-left: 0;
-            width: 100%;
+        .topbar {
+            height: 70px;
+            background-color: var(--card-bg);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .topbar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--purple);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
         }
 
         /* KPI Cards */
-        .kpi-row {
+        .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        .card {
-            background: var(--card);
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+        .kpi-card {
+            background-color: var(--card-bg);
             padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            transition: transform 0.2s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .kpi-icon-box {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .icon-blue {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .icon-orange {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .icon-green {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--accent-color);
+        }
+
+        .icon-purple {
+            background-color: rgba(139, 92, 246, 0.1);
+            color: var(--purple);
+        }
+
+        .kpi-details {
+            flex: 1;
         }
 
         .kpi-title {
-            font-size: 0.85rem;
-            color: var(--text-muted);
+            font-size: 0.8rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
         }
 
         .kpi-value {
             font-size: 1.75rem;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--text-main);
+            line-height: 1;
         }
 
-        /* Flex Layouts */
-        .grid-layout {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            align-items: start;
+        /* Workflow / Generation Card */
+        .generate-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
             margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 25px rgba(12, 35, 64, 0.15);
         }
 
-        @media(max-width: 1024px) {
-            .grid-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .section-header {
-            font-size: 1.1rem;
-            color: var(--primary);
+        .gen-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
             font-weight: 600;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
         }
 
-        /* Table */
-        .table-responsive {
-            overflow-x: auto;
+        .gen-info p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
         }
 
-        table {
+        .gen-action .btn-white {
+            background-color: white;
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gen-action .btn-white:hover {
+            background-color: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        /* Panels */
+        .dashboard-row {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            grid-template-columns: 2fr 1fr;
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fafafa;
+        }
+
+        .panel-title {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Tables */
+        .data-table {
             width: 100%;
             border-collapse: collapse;
-            text-align: left;
             font-size: 0.875rem;
         }
 
-        th {
-            padding: 0.75rem 1rem;
-            background: var(--bg);
-            color: var(--text-muted);
+        .data-table th,
+        .data-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
             font-weight: 600;
-            border-bottom: 1px solid var(--border);
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            background-color: #f8fafc;
         }
 
-        td {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid var(--border);
+        .data-table tbody tr:hover {
+            background-color: #f1f5f9;
         }
 
-        .row-hover:hover {
-            background: var(--bg);
-            cursor: pointer;
-        }
-
-        .status-badge {
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
             font-size: 0.75rem;
             font-weight: 600;
         }
 
-        .s-draft {
-            background: #f3f4f6;
-            color: #4b5563;
+        .badge-draft {
+            background-color: #e2e8f0;
+            color: #475569;
         }
 
-        .s-review {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .s-approved {
-            background: #d1fae5;
-            color: #059669;
-        }
-
-        .btn {
-            padding: 0.4rem 0.8rem;
-            border-radius: 4px;
-            border: 1px solid var(--primary);
-            font-size: 0.8rem;
-            cursor: pointer;
-            background: transparent;
-            color: var(--primary);
-            font-weight: 500;
-            transition: var(--transition);
-        }
-
-        .btn:hover {
-            background: var(--primary);
+        .badge-warning {
+            background-color: var(--warning);
             color: white;
         }
 
-        .btn-fill {
-            background: var(--primary);
+        .badge-success {
+            background-color: var(--accent-color);
             color: white;
         }
 
-        .btn-fill:hover {
-            background: var(--primary-hover);
+        .badge-blue {
+            background-color: var(--secondary-color);
+            color: white;
         }
 
-        /* Workflow Tracker */
-        .workflow {
+        /* Action buttons */
+        .actions-cell {
             display: flex;
-            justify-content: space-between;
-            position: relative;
-            margin: 2rem 0;
-            padding: 0 1rem;
-        }
-
-        .workflow::before {
-            content: "";
-            position: absolute;
-            top: 12px;
-            left: 1rem;
-            right: 1rem;
-            height: 2px;
-            background: var(--border);
-            z-index: 1;
-        }
-
-        .step {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             gap: 0.5rem;
-            width: 80px;
         }
 
-        .step-circle {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            background: var(--card);
-            border: 2px solid var(--border);
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: var(--text-muted);
-            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .step.active .step-circle {
-            border-color: var(--brand);
-            background: var(--brand);
-            color: white;
-        }
-
-        .step.done .step-circle {
-            border-color: var(--success);
-            background: var(--success);
-            color: white;
-        }
-
-        .step-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-align: center;
-        }
-
-        .step.active .step-label {
-            color: var(--brand);
-        }
-
-        /* Report Preview Panel */
-        .preview-panel {
-            display: none;
-            background: #fafafa;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .preview-panel.active {
-            display: block;
-            animation: fadeIn 0.3s;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.85rem;
-        }
-
-        .info-label {
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 0.2rem;
-        }
-
-        .info-value {
-            font-weight: 600;
-        }
-
-        .action-row {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-            border-top: 1px solid var(--border);
-            padding-top: 1rem;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .btn-icon:hover {
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+            background-color: #f0fdfa;
         }
 
         /* Deadline List */
+        .deadline-list {
+            padding: 1rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
         .deadline-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .deadline-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .dl-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.85rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            margin-bottom: 0.75rem;
         }
 
-        .deadline-title {
+        .dl-name {
             font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--primary);
-            margin-bottom: 0.2rem;
+            font-size: 0.95rem;
+            color: var(--primary-color);
         }
 
-        .deadline-date {
+        .dl-days {
             font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .countdown {
-            font-size: 0.85rem;
             font-weight: 700;
-            background: var(--warning-bg);
-            color: var(--warning);
             padding: 0.2rem 0.6rem;
             border-radius: 4px;
         }
 
-        .urgent {
-            background: var(--danger-bg);
+        .days-critical {
+            background-color: rgba(239, 68, 68, 0.1);
             color: var(--danger);
         }
 
-        .footer {
-            text-align: center;
-            padding: 1.5rem;
-            color: var(--text-muted);
+        .days-warn {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .days-safe {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--accent-color);
+        }
+
+        .dl-desc {
             font-size: 0.85rem;
-            margin-top: 2rem;
-            border-top: 1px solid var(--border);
+            color: var(--text-light);
+        }
+
+        .dl-progress {
+            width: 100%;
+            height: 6px;
+            background-color: var(--bg-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.25rem;
+        }
+
+        .dl-fill {
+            height: 100%;
+            border-radius: 3px;
         }
     </style>
 </head>
 
 <body>
-
-    <nav class="navbar">
-        <div class="nav-left">
-            <button class="menu-btn" id="sidebarToggle">☰</button>
-            <a href="#" class="logo">RegReportX</a>
-            <span class="page-title">Reporting Officer Workspace</span>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fa-solid fa-building-columns" style="font-size: 1.5rem; color: #10b981;"></i>
+            <h2>RegReportX</h2>
         </div>
-        <div class="nav-right">
-            <div class="profile">
-                <div class="avatar">RO</div>
-                <span style="font-size: 0.9rem; font-weight: 600;">R. Officer</span>
-                <button class="btn" style="margin-left: 1rem; border:none; color:var(--danger);"
-                    onclick="window.location.href='index.html'">Log Out</button>
-            </div>
-        </div>
-    </nav>
 
-    <aside class="sidebar" id="sidebar">
-        <a href="#" class="nav-link active">Dashboard</a>
-        <a href="#" class="nav-link">Draft Reports</a>
-        <a href="#" class="nav-link">Validated Reports</a>
-        <a href="#" class="nav-link">Approved Reports</a>
-        <a href="#" class="nav-link">Filing History</a>
-        <div style="padding: 1rem 1.5rem; margin-top: 2rem;">
-            <button class="btn btn-fill" style="width: 100%;">+ Generate New Report</button>
+        <div style="padding: 0 1.5rem;">
+            <button class="generate-btn">
+                <i class="fa-solid fa-plus"></i> New Report
+            </button>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="menu-item"><a href="#" class="menu-link active"><i class="fa-solid fa-gauge-high"></i>
+                    Dashboard</a></li>
+            <li class="menu-item"><a href="#" class="menu-link"><i class="fa-solid fa-file-pen"></i> Draft Reports</a>
+            </li>
+            <li class="menu-item"><a href="#" class="menu-link"><i class="fa-solid fa-file-circle-check"></i> Validated
+                    Reports</a></li>
+            <li class="menu-item"><a href="#" class="menu-link"><i class="fa-solid fa-clipboard-check"></i> Approved
+                    Reports</a></li>
+            <li class="menu-item"><a href="#" class="menu-link"><i class="fa-solid fa-clock-rotate-left"></i> Filing
+                    History</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="index.html" class="logout-btn" onclick="localStorage.removeItem('userRole')">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Secure Logout
+            </a>
         </div>
     </aside>
 
-    <main class="main-content" id="mainContent">
-        <div class="kpi-row">
-            <div class="card">
-                <div class="kpi-title">Draft</div>
-                <div class="kpi-value">4</div>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-title">Filing lifecycle & Management (RBI)</div>
+            <div class="user-profile">
+                <div class="user-info">
+                    <span class="user-name">Rohan Officer</span>
+                    <span class="user-role">Reporting Officer</span>
+                </div>
+                <div class="avatar">RO</div>
             </div>
-            <div class="card">
-                <div class="kpi-title">Under Review</div>
-                <div class="kpi-value" style="color:var(--warning);">2</div>
-            </div>
-            <div class="card">
-                <div class="kpi-title">Approved</div>
-                <div class="kpi-value" style="color:var(--success);">7</div>
-            </div>
-            <div class="card">
-                <div class="kpi-title">Filed (YTD)</div>
-                <div class="kpi-value">128</div>
-            </div>
-            <div class="card">
-                <div class="kpi-title">Rejected</div>
-                <div class="kpi-value" style="color:var(--danger);">1</div>
-            </div>
-        </div>
+        </header>
 
-        <div class="grid-layout">
-            <!-- Reports Section -->
-            <div>
-                <div class="card">
-                    <div class="section-header">Draft &amp; Pending Reports</div>
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Report ID</th>
-                                    <th>Template Name</th>
-                                    <th>Period</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="row-hover"
-                                    onclick="showPreview('REP-1102', 'RBI FORM A - LCR', 'Q3 2026', 'Draft')">
-                                    <td>REP-1102</td>
-                                    <td>RBI FORM A - LCR</td>
-                                    <td>Q3 2026</td>
-                                    <td><span class="status-badge s-draft" id="status-1102">Draft</span></td>
-                                    <td><button class="btn btn-fill"
-                                            onclick="event.stopPropagation(); validateReport('1102')">Validate</button>
-                                    </td>
-                                </tr>
-                                <tr class="row-hover"
-                                    onclick="showPreview('REP-1105', 'MAS 610 COREP', 'Oct 2026', 'Under Review')">
-                                    <td>REP-1105</td>
-                                    <td>MAS 610 COREP</td>
-                                    <td>Oct 2026</td>
-                                    <td><span class="status-badge s-review">Under Review</span></td>
-                                    <td><button class="btn">View</button></td>
-                                </tr>
-                                <tr class="row-hover"
-                                    onclick="showPreview('REP-1107', 'FCA PSD2', 'H1 2026', 'Approved')">
-                                    <td>REP-1107</td>
-                                    <td>FCA PSD2</td>
-                                    <td>H1 2026</td>
-                                    <td><span class="status-badge s-approved">Approved</span></td>
-                                    <td><button class="btn btn-fill"
-                                            style="background:var(--success); border-color:var(--success);">Submit
-                                            File</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <div class="dashboard-container">
+            <!-- Generate New Report CTA -->
+            <div class="generate-card">
+                <div class="gen-info">
+                    <h3>End of Quarter Approaching</h3>
+                    <p>3 Regulatory Reports are due in the next 15 days. Generate drafts now to allow time for
+                        compliance validation.</p>
+                </div>
+                <div class="gen-action">
+                    <button class="btn-white">Generate Reports Workflow <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Lifecycle KPIs -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon-box icon-blue">
+                        <i class="fa-solid fa-file-pen"></i>
                     </div>
+                    <div class="kpi-details">
+                        <div class="kpi-title">Draft Stage</div>
+                        <div class="kpi-value">4</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-box icon-orange">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <div class="kpi-details">
+                        <div class="kpi-title">Awaiting Approval</div>
+                        <div class="kpi-value">2</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-box icon-green">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </div>
+                    <div class="kpi-details">
+                        <div class="kpi-title">Ready to File</div>
+                        <div class="kpi-value">1</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-box icon-purple">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <div class="kpi-details">
+                        <div class="kpi-title">Filed (Last 30 Days)</div>
+                        <div class="kpi-value">8</div>
+                    </div>
+                </div>
+            </div>
 
-                    <!-- Dynamic Preview Panel -->
-                    <div class="preview-panel" id="previewPanel">
-                        <div class="section-header"
-                            style="font-size:1rem; display:flex; justify-content:space-between;">
-                            <span id="pTitle">Report Preview</span>
-                            <button style="border:none; cursor:pointer;" onclick="closePreview()">✖</button>
+            <div class="dashboard-row">
+                <!-- Working Reports Table -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title"><i class="fa-solid fa-list-check"></i> Active Report Lifecycles</div>
+                        <a href="#"
+                            style="font-size: 0.85rem; color: var(--secondary-color); font-weight: 500; text-decoration: none;">View
+                            All</a>
+                    </div>
+                    <table class="data-table" style="margin-bottom: 0;">
+                        <thead>
+                            <tr>
+                                <th>Report Info</th>
+                                <th>Reporting Period</th>
+                                <th>Lifecycle Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <strong>RCA3</strong>
+                                    <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.2rem;">
+                                        Capital Adequacy Return</div>
+                                </td>
+                                <td>Q4 2025-2026</td>
+                                <td><span class="badge badge-success">Approved - Ready</span></td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon" title="View"><i class="fa-regular fa-eye"></i></button>
+                                    <button class="btn-icon" title="File to RBI"
+                                        style="color: var(--secondary-color); border-color: var(--secondary-color);"><i
+                                            class="fa-solid fa-paper-plane"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>IRS</strong>
+                                    <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.2rem;">
+                                        Interest Rate Sensitivity</div>
+                                </td>
+                                <td>Q4 2025-2026</td>
+                                <td><span class="badge badge-warning">Awaiting Validation</span></td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon" title="View"><i class="fa-regular fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>ALE1</strong>
+                                    <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.2rem;">Large
+                                        Exposures Return</div>
+                                </td>
+                                <td>Q4 2025-2026</td>
+                                <td><span class="badge badge-draft">Drafting</span></td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon" title="Edit Draft"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn-icon" title="Delete"><i
+                                            class="fa-regular fa-trash-can"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <strong>RLS</strong>
+                                    <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.2rem;">
+                                        Return on Liquidity Support</div>
+                                </td>
+                                <td>March 2026</td>
+                                <td><span class="badge badge-draft">Drafting</span></td>
+                                <td class="actions-cell">
+                                    <button class="btn-icon" title="Edit Draft"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn-icon" title="Delete"><i
+                                            class="fa-regular fa-trash-can"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Filing Deadlines Tracker -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title"><i class="fa-regular fa-calendar-xmark"></i> Upcoming RBI Deadlines
+                        </div>
+                    </div>
+                    <div class="deadline-list">
+                        <!-- Critical Deadline -->
+                        <div class="deadline-item">
+                            <div class="dl-header">
+                                <span class="dl-name">RCA3 (Quarterly)</span>
+                                <span class="dl-days days-critical">3 Days</span>
+                            </div>
+                            <div class="dl-desc">Due on Mar 15, 2026</div>
+                            <div class="dl-progress">
+                                <div class="dl-fill" style="width: 90%; background-color: var(--danger);"></div>
+                            </div>
                         </div>
 
-                        <!-- Workflow Tracker -->
-                        <div class="workflow" id="workflowTracker">
-                            <div class="step done" id="step1">
-                                <div class="step-circle">✔</div>
-                                <div class="step-label">Draft</div>
+                        <!-- Warning Deadline -->
+                        <div class="deadline-item">
+                            <div class="dl-header">
+                                <span class="dl-name">IRS (Quarterly)</span>
+                                <span class="dl-days days-warn">8 Days</span>
                             </div>
-                            <div class="step active" id="step2">
-                                <div class="step-circle">2</div>
-                                <div class="step-label">Review</div>
-                            </div>
-                            <div class="step" id="step3">
-                                <div class="step-circle">3</div>
-                                <div class="step-label">Approve</div>
-                            </div>
-                            <div class="step" id="step4">
-                                <div class="step-circle">4</div>
-                                <div class="step-label">File</div>
+                            <div class="dl-desc">Due on Mar 20, 2026</div>
+                            <div class="dl-progress">
+                                <div class="dl-fill" style="width: 70%; background-color: var(--warning);"></div>
                             </div>
                         </div>
 
-                        <div class="info-grid">
-                            <div>
-                                <div class="info-label">Report ID</div>
-                                <div class="info-value" id="pId">-</div>
+                        <!-- Safe Deadline -->
+                        <div class="deadline-item">
+                            <div class="dl-header">
+                                <span class="dl-name">ALE1 (Quarterly)</span>
+                                <span class="dl-days days-safe">18 Days</span>
                             </div>
-                            <div>
-                                <div class="info-label">Period</div>
-                                <div class="info-value" id="pPeriod">-</div>
+                            <div class="dl-desc">Due on Mar 30, 2026</div>
+                            <div class="dl-progress">
+                                <div class="dl-fill" style="width: 30%; background-color: var(--accent-color);"></div>
                             </div>
-                            <div>
-                                <div class="info-label">Template</div>
-                                <div class="info-value" id="pTemplate">-</div>
-                            </div>
-                            <div>
-                                <div class="info-label">Generated Date</div>
-                                <div class="info-value">Oct 26, 2026</div>
-                            </div>
-                        </div>
-
-                        <div class="action-row">
-                            <button class="btn" onclick="exportDoc('CSV')">Export CSV</button>
-                            <button class="btn" onclick="exportDoc('XML')">Export XML</button>
-                            <button class="btn btn-fill" id="actionBtnSubmit">Submit for Approval</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Deadlines Sidebar -->
-            <div class="card">
-                <div class="section-header">Upcoming Deadlines</div>
-                <div class="deadline-item">
-                    <div>
-                        <div class="deadline-title">RBI FORM A - LCR</div>
-                        <div class="deadline-date">Due: Oct 28, 2026</div>
-                    </div>
-                    <div class="countdown urgent">2 Days</div>
+            <!-- Filing History Timeline -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Filing History</div>
                 </div>
-                <div class="deadline-item">
-                    <div>
-                        <div class="deadline-title">MAS 610 COREP</div>
-                        <div class="deadline-date">Due: Nov 05, 2026</div>
-                    </div>
-                    <div class="countdown">10 Days</div>
-                </div>
-                <div class="deadline-item">
-                    <div>
-                        <div class="deadline-title">FCA PSD2 File</div>
-                        <div class="deadline-date">Due: Nov 15, 2026</div>
-                    </div>
-                    <div class="countdown" style="background:#e0f2fe; color:#0284c7;">20 Days</div>
-                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Filing ID</th>
+                            <th>Report</th>
+                            <th>Filing Date</th>
+                            <th>Filing Officer</th>
+                            <th>Status from RBI</th>
+                            <th>Receipt</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="font-family: monospace; font-weight: 500;">RBI-26-00412</td>
+                            <td>Form VIII (SLR)</td>
+                            <td>20 Feb 2026 14:32</td>
+                            <td>Rohan Officer</td>
+                            <td><span style="color: var(--accent-color); font-weight: 600;"><i
+                                        class="fa-solid fa-check"></i> Accepted</span></td>
+                            <td><a href="#" style="color: var(--secondary-color); text-decoration: none;"><i
+                                        class="fa-solid fa-download"></i> Download</a></td>
+                        </tr>
+                        <tr>
+                            <td style="font-family: monospace; font-weight: 500;">RBI-26-00398</td>
+                            <td>CRR Form A</td>
+                            <td>12 Feb 2026 09:15</td>
+                            <td>Rohan Officer</td>
+                            <td><span style="color: var(--accent-color); font-weight: 600;"><i
+                                        class="fa-solid fa-check"></i> Accepted</span></td>
+                            <td><a href="#" style="color: var(--secondary-color); text-decoration: none;"><i
+                                        class="fa-solid fa-download"></i> Download</a></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-        </div>
 
-        <div class="footer">
-            &copy; 2026 RegReportX | Regulatory Filing Workspace
         </div>
     </main>
 
     <script>
-        // Sidebar
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('mainContent');
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-        });
-
-        // Preview Logic
-        const previewPanel = document.getElementById('previewPanel');
-        function showPreview(id, template, period, status) {
-            document.getElementById('pId').textContent = id;
-            document.getElementById('pTemplate').textContent = template;
-            document.getElementById('pPeriod').textContent = period;
-            document.getElementById('pTitle').textContent = `Preview: ${template}`;
-
-            // Workflow reset
-            const steps = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3'), document.getElementById('step4')];
-            steps.forEach(s => s.className = 'step');
-
-            if (status === 'Draft') {
-                steps[0].className = 'step active';
-            } else if (status === 'Under Review') {
-                steps[0].className = 'step done'; steps[1].className = 'step active';
-            } else if (status === 'Approved') {
-                steps[0].className = 'step done'; steps[1].className = 'step done'; steps[2].className = 'step active';
-            }
-
-            previewPanel.classList.add('active');
+        // Check for correct role mapping (mock security for statically hosted page)
+        const role = localStorage.getItem('userRole');
+        if (role && role !== 'REPORTING_OFFICER' && role !== 'REGTECH_ADMIN') {
+            alert('Access Denied. You do not have Reporting Officer privileges.');
+            window.location.href = 'index.html';
         }
-
-        function closePreview() {
-            previewPanel.classList.remove('active');
-        }
-
-        function validateReport(id) {
-            const badge = document.getElementById('status-' + id);
-            badge.className = 'status-badge s-review';
-            badge.textContent = 'Under Review';
-            alert(`Report REP-${id} successfully validated against central taxonomy engine and moved to 'Under Review'.`);
-            showPreview('REP-' + id, 'RBI FORM A - LCR', 'Q3 2026', 'Under Review');
-        }
-
-        function exportDoc(type) {
-            const id = document.getElementById('pId').textContent;
-            alert(`Generating ${type} package for ${id}... Download will begin shortly.`);
-        }
-
-        document.getElementById('actionBtnSubmit').addEventListener('click', function () {
-            const id = document.getElementById('pId').textContent;
-            this.textContent = 'Submitted!';
-            this.style.background = 'var(--success)';
-            this.style.borderColor = 'var(--success)';
-            alert(`${id} submitted for managerial approval. Notification dispatched.`);
-        });
-
     </script>
 </body>
 

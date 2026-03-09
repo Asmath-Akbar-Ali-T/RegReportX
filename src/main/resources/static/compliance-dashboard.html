@@ -4,418 +4,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compliance Analyst Dashboard - RegReportX</title>
+    <title>Compliance Analyst - RegReportX (RBI)</title>
+    <!-- Modern Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Config -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Enterprise Theme Variables */
         :root {
             --primary-color: #0c2340;
             /* Dark Blue */
-            --primary-hover: #153a66;
-            --background-color: #f4f6f8;
-            /* Light Grey */
+            --primary-light: #1a3a66;
+            --secondary-color: #2563eb;
+            --accent-color: #10b981;
+            --bg-color: #f3f4f6;
+            --sidebar-bg: #0c2340;
             --card-bg: #ffffff;
             --text-main: #1f2937;
-            --text-muted: #6b7280;
+            --text-light: #6b7280;
             --border-color: #e5e7eb;
-            --error-color: #dc2626;
-            --error-bg: #fef2f2;
-            --warning-color: #f59e0b;
-            --warning-bg: #fffbeb;
-            --success-color: #10b981;
-            --success-bg: #ecfdf5;
-            --info-color: #3b82f6;
-            --focus-ring: rgba(12, 35, 64, 0.15);
-            --sidebar-width: 260px;
-            --topbar-height: 64px;
-            --border-radius: 8px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --transition: all 0.3s ease;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --sidebar-width: 280px;
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-            background-color: var(--background-color);
+            background-color: var(--bg-color);
             color: var(--text-main);
-            -webkit-font-smoothing: antialiased;
             display: flex;
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* Top Navbar */
-        .topbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: var(--topbar-height);
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: white;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 1.5rem;
-            z-index: 50;
-            box-shadow: var(--shadow-sm);
+            flex-direction: column;
+            height: 100%;
+            transition: all 0.3s;
+            z-index: 100;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .topbar-left {
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
-        .toggle-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem;
-            border-radius: 4px;
-            transition: var(--transition);
-        }
-
-        .toggle-btn:hover {
-            background-color: var(--background-color);
-            color: var(--primary-color);
-        }
-
-        .logo {
+        .sidebar-header h2 {
             font-size: 1.25rem;
             font-weight: 700;
-            color: var(--primary-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            letter-spacing: 0.5px;
         }
 
-        .page-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-main);
-            border-left: 1px solid var(--border-color);
-            padding-left: 1.5rem;
-            margin-left: 0.5rem;
-            display: none;
-        }
-
-        @media (min-width: 768px) {
-            .page-title {
-                display: block;
-            }
-        }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-        }
-
-        .action-icon {
-            position: relative;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50%;
-            transition: var(--transition);
-            display: flex;
-        }
-
-        .action-icon:hover {
-            background-color: var(--background-color);
-            color: var(--primary-color);
-        }
-
-        .badge {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            background-color: var(--error-color);
-            color: white;
-            font-size: 0.65rem;
-            font-weight: 700;
-            min-width: 16px;
-            height: 16px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 4px;
-            border: 2px solid var(--card-bg);
-        }
-
-        /* Profile Dropdown */
-        .profile-menu {
-            position: relative;
-        }
-
-        .profile-btn {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.25rem;
-        }
-
-        .avatar {
-            width: 32px;
-            height: 32px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-
-        .profile-name {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--text-main);
-            display: none;
-        }
-
-        @media (min-width: 640px) {
-            .profile-name {
-                display: block;
-            }
-        }
-
-        .dropdown-content {
-            position: absolute;
-            top: 120%;
-            right: 0;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-md);
-            min-width: 150px;
-            display: none;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 100;
-        }
-
-        .dropdown-content.show {
-            display: flex;
-        }
-
-        .dropdown-item {
-            padding: 0.75rem 1rem;
-            text-decoration: none;
-            color: var(--text-main);
-            font-size: 0.875rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: var(--transition);
-            border-bottom: 1px solid var(--border-color);
-            background: none;
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background-color: var(--background-color);
-            color: var(--primary-color);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: var(--topbar-height);
-            left: 0;
-            bottom: 0;
-            width: var(--sidebar-width);
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--border-color);
-            transition: var(--transition);
-            z-index: 40;
+        .sidebar-menu {
+            flex: 1;
             overflow-y: auto;
-        }
-
-        .sidebar.collapsed {
-            transform: translateX(-100%);
-        }
-
-        .nav-list {
+            padding: 1.5rem 0;
             list-style: none;
-            padding: 1rem 0;
         }
 
-        .nav-item {
-            margin-bottom: 0.25rem;
+        .menu-item {
+            padding: 0 1rem;
+            margin-bottom: 0.5rem;
         }
 
-        .nav-link {
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.875rem 1rem;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .menu-link:hover,
+        .menu-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .menu-link i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logout-btn {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            color: var(--text-muted);
+            color: #cbd5e1;
             text-decoration: none;
-            font-size: 0.9rem;
             font-weight: 500;
-            transition: var(--transition);
-            border-left: 3px solid transparent;
+            transition: color 0.2s;
+            cursor: pointer;
         }
 
-        .nav-link:hover {
-            background-color: var(--background-color);
-            color: var(--primary-color);
+        .logout-btn:hover {
+            color: var(--danger);
         }
 
-        .nav-link.active {
-            background-color: rgba(12, 35, 64, 0.05);
-            color: var(--primary-color);
-            border-left-color: var(--primary-color);
-        }
-
-        /* Main Content wrapper */
-        .main-wrapper {
+        /* Main Content */
+        .main-content {
             flex: 1;
-            margin-top: var(--topbar-height);
-            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--bg-color);
+        }
+
+        .topbar {
+            height: 70px;
+            background-color: var(--card-bg);
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .topbar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Dashboard Content */
+        .dashboard-container {
+            flex: 1;
+            overflow-y: auto;
             padding: 2rem;
-            transition: var(--transition);
-            width: 100%;
         }
 
-        .main-wrapper.expanded {
-            margin-left: 0;
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.mobile-open {
-                transform: translateX(0);
-                box-shadow: var(--shadow-md);
-            }
-
-            .main-wrapper,
-            .main-wrapper.expanded {
-                margin-left: 0;
-            }
-        }
-
-        /* Grid Layouts */
-        .dashboard-grid {
-            display: grid;
-            gap: 1.5rem;
-            grid-template-columns: 1fr;
-        }
-
-        .kpi-row {
+        /* KPI Cards */
+        .kpi-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
-        .layout-row {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        @media (min-width: 1280px) {
-            .layout-row {
-                grid-template-columns: 2fr 1fr;
-            }
-        }
-
-        /* Card Styles */
-        .card {
+        .kpi-card {
             background-color: var(--card-bg);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            overflow: hidden;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.2s;
         }
 
-        .card:hover {
-            box-shadow: var(--shadow-md);
-        }
-
-        .kpi-card {
-            padding: 1.5rem;
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
         }
 
         .kpi-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: center;
             margin-bottom: 1rem;
         }
 
         .kpi-title {
             font-size: 0.875rem;
             font-weight: 600;
-            color: var(--text-muted);
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .kpi-icon {
-            color: var(--info-color);
-            background-color: rgba(59, 130, 246, 0.1);
-            padding: 0.5rem;
+            width: 40px;
+            height: 40px;
             border-radius: 8px;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
         }
 
         .kpi-value {
-            font-size: 1.75rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--text-main);
             margin-bottom: 0.5rem;
         }
 
-        .kpi-trend {
-            font-size: 0.75rem;
-            font-weight: 600;
+        .kpi-desc {
+            font-size: 0.85rem;
+            color: var(--text-light);
             display: flex;
             align-items: center;
-            gap: 0.25rem;
+            gap: 0.5rem;
         }
 
-        .trend-up {
-            color: var(--success-color);
+        .kpi-status-danger {
+            color: var(--danger);
+            font-weight: 600;
         }
 
-        .trend-down {
-            color: var(--error-color);
+        .kpi-status-warning {
+            color: var(--warning);
+            font-weight: 600;
         }
 
-        /* Generic Section Card */
-        .section-header {
+        .kpi-status-success {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        /* Icon Colors */
+        .icon-blue {
+            background-color: rgba(37, 99, 235, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .icon-red {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .icon-green {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--accent-color);
+        }
+
+        .icon-orange {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        /* Complex Grid Layout */
+        .dashboard-row {
+            display: grid;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .grid-2-col {
+            grid-template-columns: 2fr 1fr;
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
             padding: 1.25rem 1.5rem;
             border-bottom: 1px solid var(--border-color);
             display: flex;
@@ -424,173 +322,102 @@
             background-color: #fafafa;
         }
 
-        .section-title {
-            font-size: 1rem;
+        .panel-title {
             font-weight: 600;
+            font-size: 1.05rem;
             color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .section-body {
+        .panel-body {
             padding: 1.5rem;
             flex: 1;
-        }
-
-        /* Controls: Search & Filter */
-        .table-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .search-box {
-            position: relative;
-            flex: 1;
-            max-width: 300px;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-        }
-
-        .input-control {
-            width: 100%;
-            padding: 0.5rem 0.75rem 0.5rem 2.25rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 0.875rem;
-            transition: border-color 0.2s ease;
-        }
-
-        .input-control.no-icon {
-            padding-left: 0.75rem;
-        }
-
-        .input-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px var(--focus-ring);
-        }
-
-        .filter-select {
-            padding: 0.5rem 2rem 0.5rem 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 0.875rem;
-            background-color: white;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.5rem center;
-            background-size: 1em;
+            overflow-y: auto;
         }
 
         /* Tables */
-        .table-responsive {
-            overflow-x: auto;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
         .data-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 1rem;
             text-align: left;
-            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .data-table th {
-            background-color: #f9fafb;
-            padding: 0.75rem 1rem;
+            background-color: #f8fafc;
             font-weight: 600;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border-color);
-            white-space: nowrap;
-        }
-
-        .data-table td {
-            padding: 0.875rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-main);
-            vertical-align: middle;
-            white-space: nowrap;
-        }
-
-        .data-table tbody tr {
-            transition: background-color 0.2s ease;
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
         }
 
         .data-table tbody tr:hover {
-            background-color: #f9fafb;
+            background-color: #f1f5f9;
         }
 
         .data-table tbody tr:last-child td {
             border-bottom: none;
         }
 
-        /* Status Badges */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            line-height: 1;
-        }
-
-        .badge-error {
-            background-color: var(--error-bg);
-            color: var(--error-color);
-        }
-
-        .badge-warning {
-            background-color: var(--warning-bg);
-            color: var(--warning-color);
-        }
-
-        .badge-success {
-            background-color: var(--success-bg);
-            color: var(--success-color);
-        }
-
-        .badge-info {
-            background-color: #eff6ff;
-            color: var(--info-color);
-        }
-
-        /* Action Buttons */
-        .btn {
+        .badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0.35rem 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .badge-success {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .badge-info {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
             border-radius: 6px;
             font-size: 0.8rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
-            text-decoration: none;
             border: 1px solid transparent;
+            transition: all 0.2s;
         }
 
         .btn-outline {
+            background-color: transparent;
             border-color: var(--border-color);
-            background-color: white;
             color: var(--text-main);
         }
 
         .btn-outline:hover {
-            background-color: var(--background-color);
-            border-color: var(--primary-color);
-            color: var(--primary-color);
+            background-color: #f1f5f9;
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
         }
 
         .btn-primary {
@@ -599,678 +426,376 @@
         }
 
         .btn-primary:hover {
-            background-color: var(--primary-hover);
+            background-color: var(--primary-light);
         }
 
-        .btn-success {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #059669;
-        }
-
-        /* Exceptions Queue Styles */
-        .exception-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .exception-card {
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 1rem;
+        /* Activity Timeline */
+        .timeline {
             position: relative;
-            border-left: 4px solid var(--warning-color);
-            background-color: white;
+            padding-left: 2rem;
         }
 
-        .exception-card.resolved {
-            border-left-color: var(--success-color);
-            opacity: 0.7;
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--border-color);
         }
 
-        .exception-card.high-priority {
-            border-left-color: var(--error-color);
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
         }
 
-        .exception-header {
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -2rem;
+            top: 0.25rem;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            border: 3px solid var(--primary-color);
+            z-index: 1;
+        }
+
+        .timeline-content h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-content p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-time {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        /* Progress Bar for Breach Alerts */
+        .progress-wrapper {
+            margin-bottom: 1.25rem;
+        }
+
+        .progress-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
             font-size: 0.85rem;
-        }
-
-        .exception-id {
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        .exception-field {
             font-weight: 600;
-            font-size: 0.95rem;
             margin-bottom: 0.4rem;
         }
 
-        .exception-desc {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
-            line-height: 1.4;
-        }
-
-        .exception-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            border-top: 1px solid var(--background-color);
-            padding-top: 0.75rem;
-        }
-
-        /* Simple Bar Chart Mock */
-        .chart-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            margin-top: 1rem;
-            padding: 0 0.5rem;
-        }
-
-        .chart-bar-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .chart-label-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .chart-track {
-            height: 10px;
-            background-color: var(--background-color);
-            border-radius: 5px;
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
             overflow: hidden;
         }
 
-        .chart-fill {
+        .progress-fill {
             height: 100%;
-            border-radius: 5px;
+            border-radius: 4px;
         }
 
-        .fill-success {
-            background-color: var(--success-color);
-            width: 85%;
+        .fill-danger {
+            background-color: var(--danger);
         }
 
         .fill-warning {
-            background-color: var(--warning-color);
-            width: 10%;
+            background-color: var(--warning);
         }
 
-        .fill-error {
-            background-color: var(--error-color);
-            width: 5%;
-        }
-
-        /* Deadline Alerts */
-        .deadline-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-
-        .deadline-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.85rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background-color: white;
-            transition: var(--transition);
-        }
-
-        .deadline-item:hover {
-            border-color: var(--text-muted);
-        }
-
-        .deadline-info {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .deadline-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: var(--primary-color);
-        }
-
-        .deadline-date {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .countdown {
-            font-weight: 700;
-            font-size: 0.85rem;
-            padding: 0.35rem 0.6rem;
-            border-radius: 4px;
-        }
-
-        .countdown.danger {
-            background-color: var(--error-bg);
-            color: var(--error-color);
-        }
-
-        .countdown.warn {
-            background-color: var(--warning-bg);
-            color: var(--warning-color);
-        }
-
-        .countdown.safe {
-            background-color: var(--success-bg);
-            color: var(--success-color);
-        }
-
-        /* Pagination Simple UI */
-        .pagination {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-top: 1rem;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-        }
-
-        .page-btn {
-            border: 1px solid var(--border-color);
-            background: white;
-            padding: 0.3rem 0.6rem;
-            border-radius: 4px;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
-
-        .page-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-
-        /* Footer */
-        .footer {
-            margin-top: auto;
-            text-align: center;
-            padding: 1.5rem;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            border-top: 1px solid var(--border-color);
-            background-color: var(--card-bg);
+        .fill-success {
+            background-color: var(--accent-color);
         }
     </style>
 </head>
 
 <body>
-
-    <!-- Top Navbar -->
-    <nav class="topbar">
-        <div class="topbar-left">
-            <button class="toggle-btn" id="sidebarToggle" title="Toggle Sidebar">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                </svg>
-            </button>
-            <a href="#" class="logo">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="12" y1="8" x2="12" y2="16"></line>
-                    <line x1="8" y1="12" x2="16" y2="12"></line>
-                </svg>
-                RegReportX
-            </a>
-            <span class="page-title">Compliance Analyst Dashboard</span>
+    <!-- Sidebar for Compliance Analyst -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fa-solid fa-building-columns" style="font-size: 1.5rem; color: #10b981;"></i>
+            <h2>RegReportX</h2>
         </div>
 
-        <div class="topbar-right">
-            <!-- Notifications -->
-            <button class="action-icon" id="notifToggle" title="Notifications">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                </svg>
-                <span class="badge">3</span>
-            </button>
-
-            <!-- Profile Dropdown -->
-            <div class="profile-menu">
-                <button class="profile-btn" id="profileToggle">
-                    <div class="avatar">CA</div>
-                    <span class="profile-name">C. Analyst</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
-                </button>
-                <div class="dropdown-content" id="profileDropdown">
-                    <a href="#" class="dropdown-item">My Profile</a>
-                    <a href="#" class="dropdown-item">Settings</a>
-                    <button class="dropdown-item" id="logoutBtn" style="color: var(--error-color);">Log Out</button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Left Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <ul class="nav-list">
-            <li class="nav-item">
-                <a href="#" class="nav-link active">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="3" width="7" height="9"></rect>
-                        <rect x="14" y="3" width="7" height="5"></rect>
-                        <rect x="14" y="12" width="7" height="9"></rect>
-                        <rect x="3" y="16" width="7" height="5"></rect>
-                    </svg>
-                    Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="17 8 12 3 7 8"></polyline>
-                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                    </svg>
-                    Data Ingestion Status
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    </svg>
-                    Data Quality Console
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    Validation Rules
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="8" y1="6" x2="21" y2="6"></line>
-                        <line x1="8" y1="12" x2="21" y2="12"></line>
-                        <line x1="8" y1="18" x2="21" y2="18"></line>
-                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                    </svg>
-                    Exception Queue
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21.5 12H16c-.7 2-2 3-4 3s-3.3-1-4-3H2.5"></path>
-                        <path
-                            d="M5.5 5.1L2 12v6c0 1.1.9 2 2 2h16a2 2 0 002-2v-6l-3.4-6.9A2 2 0 0016.8 4H7.2a2 2 0 00-1.8 1.1z">
-                        </path>
-                    </svg>
-                    Reports Under Review
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 20h9"></path>
-                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                    </svg>
-                    Audit Logs
-                </a>
-            </li>
+        <ul class="sidebar-menu">
+            <li class="menu-item"><a href="#" class="menu-link active"><i class="fa-solid fa-chart-line"></i>
+                    Dashboard</a></li>
+            <li class="menu-item"><a href="#" class="menu-link"><i class="fa-solid fa-database"></i> Data Quality
+                    Console</a></li>
+            <li class="menu-item"><a href="#" class="menu-link"><i class="fa-solid fa-triangle-exclamation"></i>
+                    Exception Queue</a></li>
+            <li class="menu-item"><a href="#" class="menu-link"><i class="fa-solid fa-shield-halved"></i> Breach
+                    Monitoring</a></li>
+            <li class="menu-item"><a href="#" class="menu-link"><i class="fa-solid fa-file-signature"></i> Filing
+                    Workflow</a></li>
+            <li class="menu-item"><a href="#" class="menu-link"><i class="fa-solid fa-list-check"></i> Audit Trail
+                    View</a></li>
         </ul>
+
+        <div class="sidebar-footer">
+            <a href="index.html" class="logout-btn" onclick="localStorage.removeItem('userRole')">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Secure Logout
+            </a>
+        </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <main class="main-wrapper" id="mainWrapper">
-        <div class="dashboard-grid">
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-title">Compliance Operations Center (RBI)</div>
+            <div class="user-profile">
+                <i class="fa-regular fa-bell"
+                    style="font-size: 1.25rem; color: var(--text-light); cursor: pointer; position: relative;">
+                    <span
+                        style="position:absolute; top:-4px; right:-2px; background:red; height:8px; width:8px; border-radius:50%;"></span>
+                </i>
+                <div style="width: 1px; height: 30px; background-color: var(--border-color); margin: 0 0.5rem;"></div>
+                <div class="user-info">
+                    <span class="user-name">Clemence Analyst</span>
+                    <span class="user-role">Compliance Analyst</span>
+                </div>
+                <div class="avatar">CA</div>
+            </div>
+        </header>
 
-            <!-- 1. KPI Summary Cards -->
-            <div class="kpi-row">
-                <div class="card kpi-card">
+        <!-- Dashboard Widgets -->
+        <div class="dashboard-container">
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
                     <div class="kpi-header">
-                        <span class="kpi-title">Total Reports Pending</span>
-                        <div class="kpi-icon">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                                <polyline points="10 9 9 9 8 9"></polyline>
-                            </svg>
-                        </div>
+                        <span class="kpi-title">Validation Issues</span>
+                        <div class="kpi-icon icon-red"><i class="fa-solid fa-xmark"></i></div>
                     </div>
-                    <div class="kpi-value">14</div>
-                    <div class="kpi-trend trend-down">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
-                            <polyline points="17 18 23 18 23 12"></polyline>
-                        </svg>
-                        -2 from last week
+                    <div class="kpi-value">42</div>
+                    <div class="kpi-desc">
+                        <span class="kpi-status-danger"><i class="fa-solid fa-arrow-up"></i> +5%</span> vs last filing
                     </div>
                 </div>
-
-                <div class="card kpi-card">
+                <div class="kpi-card">
                     <div class="kpi-header">
-                        <span class="kpi-title">Open DQ Issues</span>
-                        <div class="kpi-icon" style="color: var(--warning-color); background-color: var(--warning-bg);">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path
-                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
-                                </path>
-                                <line x1="12" y1="9" x2="12" y2="13"></line>
-                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                            </svg>
-                        </div>
+                        <span class="kpi-title">Open Exceptions</span>
+                        <div class="kpi-icon icon-orange"><i class="fa-solid fa-bolt"></i></div>
                     </div>
-                    <div class="kpi-value" id="kpiWarningsCount">42</div>
-                    <div class="kpi-trend trend-up">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                            <polyline points="17 6 23 6 23 12"></polyline>
-                        </svg>
-                        +5% this week
+                    <div class="kpi-value">12</div>
+                    <div class="kpi-desc">
+                        <span class="kpi-status-warning">3 Critical Severity</span>
                     </div>
                 </div>
-
-                <div class="card kpi-card">
+                <div class="kpi-card">
                     <div class="kpi-header">
-                        <span class="kpi-title">Critical Failures</span>
-                        <div class="kpi-icon" style="color: var(--error-color); background-color: var(--error-bg);">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="15" y1="9" x2="9" y2="15"></line>
-                                <line x1="9" y1="9" x2="15" y2="15"></line>
-                            </svg>
-                        </div>
+                        <span class="kpi-title">RBI Breach Alerts</span>
+                        <div class="kpi-icon icon-blue"><i class="fa-solid fa-landmark"></i></div>
                     </div>
-                    <div class="kpi-value" id="kpiErrorsCount">8</div>
-                    <div class="kpi-trend trend-down">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
-                            <polyline points="17 18 23 18 23 12"></polyline>
-                        </svg>
-                        -3 fixed today
+                    <div class="kpi-value">2</div>
+                    <div class="kpi-desc">
+                        <span class="kpi-status-danger">CRAR Limit Warning</span>
                     </div>
                 </div>
-
-                <div class="card kpi-card">
+                <div class="kpi-card">
                     <div class="kpi-header">
-                        <span class="kpi-title">Reports Due This Week</span>
-                        <div class="kpi-icon" style="color: var(--success-color); background-color: var(--success-bg);">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                <line x1="16" y1="2" x2="16" y2="6"></line>
-                                <line x1="8" y1="2" x2="8" y2="6"></line>
-                                <line x1="3" y1="10" x2="21" y2="10"></line>
-                            </svg>
-                        </div>
+                        <span class="kpi-title">Awaiting Validation</span>
+                        <div class="kpi-icon icon-green"><i class="fa-solid fa-file-circle-check"></i></div>
                     </div>
                     <div class="kpi-value">5</div>
-                    <div class="kpi-trend trend-up">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                        </svg>
-                        2 submitted
+                    <div class="kpi-desc">
+                        <span class="kpi-status-success">Due in 48 hours</span>
                     </div>
                 </div>
             </div>
 
-            <div class="layout-row">
-                <!-- 2. Data Quality Issues Table -->
-                <div class="card" style="grid-column: span 1;">
-                    <div class="section-header">
-                        <h2 class="section-title">Data Quality Issues</h2>
+            <div class="dashboard-row grid-2-col">
+                <!-- Data Validation Results -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title"><i class="fa-solid fa-table-list"></i> Exception Investigation Queue
+                        </div>
+                        <button class="btn-sm btn-outline">View All</button>
                     </div>
-                    <div class="section-body">
-                        <div class="table-controls">
-                            <div class="search-box">
-                                <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                    stroke="currentColor" stroke-width="2">
-                                    <circle cx="11" cy="11" r="8"></circle>
-                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                </svg>
-                                <input type="text" id="searchInput" class="input-control"
-                                    placeholder="Search by Rule or ID...">
-                            </div>
-                            <select id="severityFilter" class="filter-select">
-                                <option value="all">All Severities</option>
-                                <option value="Error">Errors Only</option>
-                                <option value="Warning">Warnings Only</option>
-                            </select>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table class="data-table" id="dqTable">
-                                <thead>
-                                    <tr>
-                                        <th>Issue ID</th>
-                                        <th>Rule Name</th>
-                                        <th>Batch ID</th>
-                                        <th>Severity</th>
-                                        <th>Logged Date</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>#DQ-8041</td>
-                                        <td>Missing LEI Code</td>
-                                        <td>B-901</td>
-                                        <td><span class="status-badge badge-error">Error</span></td>
-                                        <td>Oct 20, 2026</td>
-                                        <td>Open</td>
-                                        <td><button class="btn btn-outline"
-                                                onclick="alert('Viewing DQ-8041 Details')">View</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>#DQ-8042</td>
-                                        <td>Invalid Counterparty Sector</td>
-                                        <td>B-901</td>
-                                        <td><span class="status-badge badge-warning">Warning</span></td>
-                                        <td>Oct 20, 2026</td>
-                                        <td>Open</td>
-                                        <td><button class="btn btn-outline">View</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>#DQ-8038</td>
-                                        <td>Currency Mismatch</td>
-                                        <td>B-885</td>
-                                        <td><span class="status-badge badge-error">Error</span></td>
-                                        <td>Oct 19, 2026</td>
-                                        <td>Open</td>
-                                        <td><button class="btn btn-outline">View</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>#DQ-8025</td>
-                                        <td>Notional Amt > Threshold</td>
-                                        <td>B-880</td>
-                                        <td><span class="status-badge badge-warning">Warning</span></td>
-                                        <td>Oct 18, 2026</td>
-                                        <td>Resolved</td>
-                                        <td><button class="btn btn-outline">View</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="pagination">
-                            <span>Showing 1 to 4 of 50 entries</span>
-                            <button class="page-btn">&lt;</button>
-                            <button class="page-btn active">1</button>
-                            <button class="page-btn">2</button>
-                            <button class="page-btn">3</button>
-                            <button class="page-btn">&gt;</button>
-                        </div>
+                    <div class="panel-body" style="padding: 0;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Exception ID</th>
+                                    <th>Dataset</th>
+                                    <th>Issue Type</th>
+                                    <th>Severity</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="font-weight: 600;">EX-9041</td>
+                                    <td>Liquidity Data</td>
+                                    <td>Missing Counterparty LEI</td>
+                                    <td><span class="badge badge-danger">High</span></td>
+                                    <td><button class="btn-sm btn-primary">Investigate</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">EX-9042</td>
+                                    <td>Credit Risk</td>
+                                    <td>Invalid Collateral Value</td>
+                                    <td><span class="badge badge-danger">High</span></td>
+                                    <td><button class="btn-sm btn-primary">Investigate</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">EX-9046</td>
+                                    <td>Large Exposures</td>
+                                    <td>Format Mismatch (Amount)</td>
+                                    <td><span class="badge badge-warning">Medium</span></td>
+                                    <td><button class="btn-sm btn-primary">Investigate</button></td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: 600;">EX-9051</td>
+                                    <td>Market Risk</td>
+                                    <td>Negative Interest Rate Value</td>
+                                    <td><span class="badge badge-info">Low</span></td>
+                                    <td><button class="btn-sm btn-primary">Investigate</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- Right Column Stack -->
-                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-
-                    <!-- 4. Validation Summary Chart (Mock) -->
-                    <div class="card">
-                        <div class="section-header">
-                            <h2 class="section-title">Validation Summary (Batch #901)</h2>
-                        </div>
-                        <div class="section-body">
-                            <div class="chart-container">
-                                <div class="chart-bar-group">
-                                    <div class="chart-label-row">
-                                        <span>Passed (4,250 rows)</span>
-                                        <span class="trend-up">85%</span>
-                                    </div>
-                                    <div class="chart-track">
-                                        <div class="chart-fill fill-success"></div>
-                                    </div>
-                                </div>
-
-                                <div class="chart-bar-group">
-                                    <div class="chart-label-row">
-                                        <span>Warnings (500 rows)</span>
-                                        <span style="color: var(--warning-color)">10%</span>
-                                    </div>
-                                    <div class="chart-track">
-                                        <div class="chart-fill fill-warning"></div>
-                                    </div>
-                                </div>
-
-                                <div class="chart-bar-group">
-                                    <div class="chart-label-row">
-                                        <span>Failed (250 rows)</span>
-                                        <span class="trend-down">5%</span>
-                                    </div>
-                                    <div class="chart-track">
-                                        <div class="chart-fill fill-error"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <!-- RBI Regulatory Breach Monitoring -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title"><i class="fa-solid fa-chart-pie"></i> RBI Breach Monitoring (CRAR &
+                            LCR)</div>
                     </div>
-
-                    <!-- 5. Deadline Alerts -->
-                    <div class="card flex-1">
-                        <div class="section-header">
-                            <h2 class="section-title">Upcoming Deadlines</h2>
-                        </div>
-                        <div class="section-body" style="padding: 1rem;">
-                            <div class="deadline-list">
-                                <div class="deadline-item">
-                                    <div class="deadline-info">
-                                        <span class="deadline-name">RBI LCR Daily</span>
-                                        <span class="deadline-date">Due: Oct 21, 2026 - 5:00 PM</span>
-                                    </div>
-                                    <div class="countdown danger">2 hrs</div>
-                                </div>
-                                <div class="deadline-item">
-                                    <div class="deadline-info">
-                                        <span class="deadline-name">MAS 610 Monthly</span>
-                                        <span class="deadline-date">Due: Oct 25, 2026</span>
-                                    </div>
-                                    <div class="countdown warn">4 Days</div>
-                                </div>
-                                <div class="deadline-item">
-                                    <div class="deadline-info">
-                                        <span class="deadline-name">FCA COREP Q3</span>
-                                        <span class="deadline-date">Due: Nov 10, 2026</span>
-                                    </div>
-                                    <div class="countdown safe">20 Days</div>
-                                </div>
+                    <div class="panel-body">
+                        <!-- CRAR -->
+                        <div class="progress-wrapper">
+                            <div class="progress-header">
+                                <span>Capital to Risk Weighted Assets (CRAR)</span>
+                                <span style="color: var(--danger);">10.1% / 11.5% limit</span>
                             </div>
+                            <div class="progress-track">
+                                <div class="progress-fill fill-danger" style="width: 87.8%;"></div>
+                            </div>
+                            <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">Alert: Falls
+                                below RBI mandate 2026</p>
+                        </div>
+
+                        <!-- LCR -->
+                        <div class="progress-wrapper">
+                            <div class="progress-header">
+                                <span>Liquidity Coverage Ratio (LCR)</span>
+                                <span>115% / 100% limit</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill fill-success" style="width: 100%;"></div>
+                            </div>
+                            <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">Status:
+                                Healthy</p>
+                        </div>
+
+                        <!-- Large Exposures -->
+                        <div class="progress-wrapper">
+                            <div class="progress-header">
+                                <span>Large Exposure (Single Counterparty)</span>
+                                <span style="color: var(--warning);">18.5% / 20.0% max</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill fill-warning" style="width: 92.5%;"></div>
+                            </div>
+                            <p style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">Warning:
+                                Approaching concentration limits</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 3. Exception Queue Panel -->
-            <div class="card" style="margin-bottom: 2rem;">
-                <div class="section-header">
-                    <h2 class="section-title">Exception Queue Action Center</h2>
-                    <span class="status-badge badge-warning">2 Action Required</span>
-                </div>
-                <div class="section-body">
-                    <div class="exception-list">
-                        <!-- Exception Card 1 -->
-                        <div class="exception-card high-priority" id="exc-1">
-                            <div class="exception-header">
-                                <span class="exception-id">EX-10492 | Report: RBI-NSFR</span>
-                                <span class="status-badge badge-error">Pending Review</span>
-                            </div>
-                            <div class="exception-field">Field: counterparty_exposure_amt</div>
-                            <div class="exception-desc">
-                                Discrepancy detected between source system core banking ledger and data warehouse
-                                staging. Difference exceeds acceptable 0.05% threshold (Actual: 1.2%). Manual override
-                                or source correction required before submission.
-                            </div>
-                            <div class="exception-footer">
-                                <span>Assigned To: <strong>C. Analyst</strong></span>
-                                <button class="btn btn-primary btn-resolve" data-target="exc-1">Resolve Issue</button>
-                            </div>
+            <!-- Reports Awaiting Validation & Audit -->
+            <div class="dashboard-row grid-2-col">
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title"><i class="fa-solid fa-file-contract"></i> Reports Awaiting Validation
                         </div>
+                    </div>
+                    <div class="panel-body" style="padding: 0;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Report Code</th>
+                                    <th>Description</th>
+                                    <th>Deadline</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>RCA3</strong></td>
+                                    <td>Basel III Capital Adequacy</td>
+                                    <td>15 Mar 2026</td>
+                                    <td><span class="badge badge-warning">Pending Review</span></td>
+                                    <td><button class="btn-sm btn-outline">Validate</button></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>RLR1</strong></td>
+                                    <td>Liquidity Return</td>
+                                    <td>15 Mar 2026</td>
+                                    <td><span class="badge badge-warning">Pending Review</span></td>
+                                    <td><button class="btn-sm btn-outline">Validate</button></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>ALE1</strong></td>
+                                    <td>Large Exposures Framework</td>
+                                    <td>31 Mar 2026</td>
+                                    <td><span class="badge badge-success">Data Ready</span></td>
+                                    <td><button class="btn-sm btn-outline">Validate</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
-                        <!-- Exception Card 2 -->
-                        <div class="exception-card">
-                            <div class="exception-header">
-                                <span class="exception-id">EX-10488 | Report: FED-Y9C</span>
-                                <span class="status-badge badge-warning">Under Investigation</span>
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title"><i class="fa-solid fa-clock-rotate-left"></i> Recent Audit Log</div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Exception Resolved (EX-9038)</h4>
+                                    <p>Counterparty LEI mapping overridden by Admin</p>
+                                    <span class="timeline-time">Today, 09:41 AM</span>
+                                </div>
                             </div>
-                            <div class="exception-field">Field: rwa_credit_risk</div>
-                            <div class="exception-desc">
-                                Regulatory asset classification code missing for 14 syndicated loan facilities.
-                                Defaulted to unrated category resulting in severe capital charge spike.
+                            <div class="timeline-item">
+                                <div class="timeline-marker" style="border-color: var(--warning);"></div>
+                                <div class="timeline-content">
+                                    <h4>Validation Rule Triggered</h4>
+                                    <p>Unsecured Exposure threshold breached</p>
+                                    <span class="timeline-time">Yesterday, 16:30 PM</span>
+                                </div>
                             </div>
-                            <div class="exception-footer">
-                                <span>Assigned To: <strong>Risk Ops Team</strong></span>
-                                <button class="btn btn-outline">View Details</button>
+                            <div class="timeline-item">
+                                <div class="timeline-marker"></div>
+                                <div class="timeline-content">
+                                    <h4>Report RCA3 Drafted</h4>
+                                    <p>Moved to validation queue by Reporting team</p>
+                                    <span class="timeline-time">Yesterday, 14:15 PM</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1278,137 +803,14 @@
             </div>
 
         </div>
-
-        <!-- Footer inside main wrapper -->
-        <footer class="footer">
-            <p>&copy; 2026 RegReportX | Secure Regulatory Filing Platform</p>
-        </footer>
     </main>
-
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // 1. Sidebar Toggle Logic
-            const sidebarToggleBtn = document.getElementById('sidebarToggle');
-            const sidebar = document.getElementById('sidebar');
-            const mainWrapper = document.getElementById('mainWrapper');
-
-            sidebarToggleBtn.addEventListener('click', () => {
-                // Check if on mobile or desktop
-                if (window.innerWidth <= 1024) {
-                    sidebar.classList.toggle('mobile-open');
-                } else {
-                    sidebar.classList.toggle('collapsed');
-                    mainWrapper.classList.toggle('expanded');
-                }
-            });
-
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', (e) => {
-                if (window.innerWidth <= 1024 &&
-                    sidebar.classList.contains('mobile-open') &&
-                    !sidebar.contains(e.target) &&
-                    !sidebarToggleBtn.contains(e.target)) {
-                    sidebar.classList.remove('mobile-open');
-                }
-            });
-
-            // 2. Profile Dropdown Logic
-            const profileBtn = document.getElementById('profileToggle');
-            const profileDropdown = document.getElementById('profileDropdown');
-
-            profileBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                profileDropdown.classList.toggle('show');
-            });
-
-            // Close dropdown if clicked outside
-            document.addEventListener('click', (e) => {
-                if (!profileDropdown.contains(e.target)) {
-                    profileDropdown.classList.remove('show');
-                }
-            });
-
-            // Logout Functionality
-            const logoutBtn = document.getElementById('logoutBtn');
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', () => {
-                    window.location.href = 'index.html';
-                });
-            }
-
-            // 3. Table Filtering & Searching
-            const searchInput = document.getElementById('searchInput');
-            const severityFilter = document.getElementById('severityFilter');
-            const dqTable = document.getElementById('dqTable');
-            const tbody = dqTable.querySelector('tbody');
-            const rows = tbody.querySelectorAll('tr');
-
-            function filterTable() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const severityTerm = severityFilter.value;
-                let visibleRows = 0;
-                let eCount = 0;
-                let wCount = 0;
-
-                rows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    const severityCell = row.querySelector('td:nth-child(4)').textContent.trim();
-
-                    const matchesSearch = text.includes(searchTerm);
-                    const matchesSeverity = (severityTerm === 'all') || (severityCell === severityTerm);
-
-                    if (matchesSearch && matchesSeverity) {
-                        row.style.display = '';
-                        visibleRows++;
-                        // Just simulation updates
-                        if (severityCell === 'Error') eCount++;
-                        if (severityCell === 'Warning') wCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-
-                // Dynamically update the KPI counts based on table filter for interactivity
-                if (searchTerm === '' && severityTerm === 'all') {
-                    document.getElementById('kpiErrorsCount').textContent = '8';
-                    document.getElementById('kpiWarningsCount').textContent = '42';
-                } else {
-                    document.getElementById('kpiErrorsCount').textContent = eCount;
-                    document.getElementById('kpiWarningsCount').textContent = wCount;
-                }
-            }
-
-            searchInput.addEventListener('input', filterTable);
-            severityFilter.addEventListener('change', filterTable);
-
-            // 4. Exception Queue Resolve Action Simulation
-            const resolveBtns = document.querySelectorAll('.btn-resolve');
-            resolveBtns.forEach(btn => {
-                btn.addEventListener('click', function (e) {
-                    const targetId = this.getAttribute('data-target');
-                    const card = document.getElementById(targetId);
-
-                    if (card) {
-                        // Change styling
-                        card.classList.remove('high-priority');
-                        card.classList.add('resolved');
-
-                        // Change Badge
-                        const badge = card.querySelector('.exception-header .status-badge');
-                        badge.className = 'status-badge badge-success';
-                        badge.textContent = 'Resolved';
-
-                        // Update button
-                        this.className = 'btn btn-success';
-                        this.textContent = 'Issue Resolved';
-                        this.disabled = true;
-
-                        // Fake toast notification
-                        alert('Exception issue resolved successfully and logged to audit trail.');
-                    }
-                });
-            });
-        });
+        // Check for correct role mapping (mock security for statically hosted page)
+        const role = localStorage.getItem('userRole');
+        if (role && role !== 'COMPLIANCE_ANALYST' && role !== 'REGTECH_ADMIN') {
+            alert('Access Denied. You do not have Compliance Analyst privileges.');
+            window.location.href = 'index.html';
+        }
     </script>
 </body>
 
