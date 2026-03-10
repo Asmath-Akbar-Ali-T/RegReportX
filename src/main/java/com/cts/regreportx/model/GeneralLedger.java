@@ -12,28 +12,28 @@ import java.time.LocalDate;
 public class GeneralLedger {
 
     @Id
-    @Column(name = "GLID")
+    @Column(name = "\"GLID\"")
     private String glId;
 
-    @Column(name = "AccountNumber")
+    @Column(name = "\"AccountNumber\"")
     private Long accountNumber;
 
-    @Column(name = "BranchID")
+    @Column(name = "\"BranchID\"")
     private String branchId;
 
-    @Column(name = "AccountType")
+    @Column(name = "\"AccountType\"")
     private String accountType;
 
-    @Column(name = "Debit")
+    @Column(name = "\"Debit\"")
     private BigDecimal debit;
 
-    @Column(name = "Credit")
+    @Column(name = "\"Credit\"")
     private BigDecimal credit;
 
-    @Column(name = "Currency")
+    @Column(name = "\"Currency\"")
     private String currency;
 
-    @Column(name = "TransactionDate")
+    @Column(name = "\"TransactionDate\"")
     private LocalDate transactionDate;
 
     public GeneralLedger() {

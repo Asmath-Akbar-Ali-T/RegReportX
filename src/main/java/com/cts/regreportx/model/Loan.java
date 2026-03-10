@@ -12,34 +12,34 @@ import java.time.LocalDate;
 public class Loan {
 
     @Id
-    @Column(name = "LoanID")
+    @Column(name = "\"LoanID\"")
     private String loanId;
 
-    @Column(name = "CustomerID")
+    @Column(name = "\"CustomerID\"")
     private Integer customerId;
 
-    @Column(name = "BranchID")
+    @Column(name = "\"BranchID\"")
     private String branchId;
 
-    @Column(name = "LoanType")
+    @Column(name = "\"LoanType\"")
     private String loanType;
 
-    @Column(name = "LoanAmount")
+    @Column(name = "\"LoanAmount\"")
     private BigDecimal loanAmount;
 
-    @Column(name = "InterestRate")
+    @Column(name = "\"InterestRate\"")
     private BigDecimal interestRate;
 
-    @Column(name = "Currency")
+    @Column(name = "\"Currency\"")
     private String currency;
 
-    @Column(name = "StartDate")
+    @Column(name = "\"StartDate\"")
     private LocalDate startDate;
 
-    @Column(name = "MaturityDate")
+    @Column(name = "\"MaturityDate\"")
     private LocalDate maturityDate;
 
-    @Column(name = "Status")
+    @Column(name = "\"Status\"")
     private String status;
 
     public Loan() {

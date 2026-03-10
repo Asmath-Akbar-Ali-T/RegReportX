@@ -12,25 +12,25 @@ import java.time.LocalDate;
 public class TreasuryTrade {
 
     @Id
-    @Column(name = "TradeID")
+    @Column(name = "\"TradeID\"")
     private String tradeId;
 
-    @Column(name = "Instrument")
+    @Column(name = "\"Instrument\"")
     private String instrument;
 
-    @Column(name = "Counterparty")
+    @Column(name = "\"Counterparty\"")
     private String counterparty;
 
-    @Column(name = "Notional")
+    @Column(name = "\"Notional\"")
     private BigDecimal notional;
 
-    @Column(name = "Currency")
+    @Column(name = "\"Currency\"")
     private String currency;
 
-    @Column(name = "TradeDate")
+    @Column(name = "\"TradeDate\"")
     private LocalDate tradeDate;
 
-    @Column(name = "MaturityDate")
+    @Column(name = "\"MaturityDate\"")
     private LocalDate maturityDate;
 
     public TreasuryTrade() {

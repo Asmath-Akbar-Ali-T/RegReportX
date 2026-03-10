@@ -12,31 +12,31 @@ import java.time.LocalDate;
 public class Deposit {
 
     @Id
-    @Column(name = "DepositID")
+    @Column(name = "\"DepositID\"")
     private String depositId;
 
-    @Column(name = "CustomerID")
+    @Column(name = "\"CustomerID\"")
     private Integer customerId;
 
-    @Column(name = "BranchID")
+    @Column(name = "\"BranchID\"")
     private String branchId;
 
-    @Column(name = "DepositType")
+    @Column(name = "\"DepositType\"")
     private String depositType;
 
-    @Column(name = "Amount")
+    @Column(name = "\"Amount\"")
     private BigDecimal amount;
 
-    @Column(name = "InterestRate")
+    @Column(name = "\"InterestRate\"")
     private BigDecimal interestRate;
 
-    @Column(name = "Currency")
+    @Column(name = "\"Currency\"")
     private String currency;
 
-    @Column(name = "OpenDate")
+    @Column(name = "\"OpenDate\"")
     private LocalDate openDate;
 
-    @Column(name = "MaturityDate")
+    @Column(name = "\"MaturityDate\"")
     private LocalDate maturityDate;
 
     public Deposit() {
