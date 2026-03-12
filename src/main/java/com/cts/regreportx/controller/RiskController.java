@@ -5,6 +5,8 @@ import com.cts.regreportx.service.RiskCalculationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,5 +27,11 @@ public class RiskController {
     public ResponseEntity<List<RiskMetric>> getMetrics() {
         // If needed, we'll return all calculated metrics from database
         return ResponseEntity.ok(riskCalculationService.getAllMetrics());
+    }
+
+    @PostMapping("/calculate/{reportId}")
+    public ResponseEntity<List<RiskMetric>> calculateMetrics(@PathVariable Integer reportId) {
+        List<RiskMetric> metrics = riskCalculationService.calculateMetrics(reportId);
+        return ResponseEntity.ok(metrics);
     }
 }
