@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/risk")
@@ -25,13 +28,21 @@ public class RiskController {
 
     @GetMapping("/metrics")
     public ResponseEntity<List<RiskMetric>> getMetrics() {
-        // If needed, we'll return all calculated metrics from database
         return ResponseEntity.ok(riskCalculationService.getAllMetrics());
     }
 
     @PostMapping("/calculate/{reportId}")
-    public ResponseEntity<List<RiskMetric>> calculateMetrics(@PathVariable Integer reportId) {
+    public ResponseEntity<Map<String, Object>> calculateMetrics(@PathVariable Integer reportId) {
         List<RiskMetric> metrics = riskCalculationService.calculateMetrics(reportId);
-        return ResponseEntity.ok(metrics);
+        
+        List<String> metricNames = metrics.stream()
+                .map(RiskMetric::getMetricName)
+                .collect(Collectors.toList());
+                
+        Map<String, Object> response = new HashMap<>();
+        response.put("reportId", reportId);
+        response.put("metricsCalculated", metricNames);
+        
+        return ResponseEntity.ok(response);
     }
 }

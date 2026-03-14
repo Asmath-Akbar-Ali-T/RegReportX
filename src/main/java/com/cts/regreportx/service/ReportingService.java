@@ -8,6 +8,7 @@ import com.cts.regreportx.repository.FilingWorkflowRepository;
 import com.cts.regreportx.repository.RegReportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,6 +60,49 @@ public class ReportingService {
         auditService.logAction(1, "GENERATE_REPORT", "TemplateID: " + templateId,
                 "Report generated ID: " + report.getReportId());
 
+        return report;
+    }
+
+    @Transactional
+    public RegReport submitReportForReview(Integer reportId, Integer actorId) {
+        return advanceWorkflow(reportId, actorId, "DRAFT", "UNDER_REVIEW");
+    }
+
+    @Transactional
+    public RegReport approveReport(Integer reportId, Integer actorId, String comments) {
+        RegReport report = advanceWorkflow(reportId, actorId, "UNDER_REVIEW", "APPROVED");
+        if (comments != null && !comments.trim().isEmpty()) {
+            auditService.logAction(actorId, "APPROVE_REPORT_WITH_COMMENTS", "ReportID: " + reportId, "Comments: " + comments);
+        }
+        return report;
+    }
+
+    @Transactional
+    public RegReport fileReport(Integer reportId, Integer actorId) {
+        return advanceWorkflow(reportId, actorId, "APPROVED", "FILED");
+    }
+
+    private RegReport advanceWorkflow(Integer reportId, Integer actorId, String expectedCurrentStatus, String nextStatus) {
+        RegReport report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found: " + reportId));
+        
+        if (!expectedCurrentStatus.equals(report.getStatus())) {
+            throw new IllegalStateException("Cannot advance report to " + nextStatus + ". Current status is " + report.getStatus() + ", expected " + expectedCurrentStatus);
+        }
+        
+        report.setStatus(nextStatus);
+        report = reportRepository.save(report);
+        
+        FilingWorkflow workflow = new FilingWorkflow();
+        workflow.setReportId(reportId);
+        workflow.setStepName(nextStatus);
+        workflow.setActorId(actorId);
+        workflow.setStepDate(LocalDateTime.now());
+        workflow.setStatus("COMPLETED");
+        workflowRepository.save(workflow);
+        
+        auditService.logAction(actorId, "WORKFLOW_ADVANCE", "ReportID: " + reportId, "Status changed from " + expectedCurrentStatus + " to " + nextStatus);
+        
         return report;
     }
 
