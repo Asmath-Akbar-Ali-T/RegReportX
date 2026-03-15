@@ -32,7 +32,20 @@ public class AuthController {
 
         User user = userOptional.get();
 
-        if (!user.getPassword().equals(password)) {
+        boolean passwordMatches = false;
+        if (user.getPassword() != null && user.getPassword().startsWith("$2a$")) {
+            try {
+                // Import org.mindrot.jbcrypt.BCrypt or use fully qualified name
+                passwordMatches = org.mindrot.jbcrypt.BCrypt.checkpw(password, user.getPassword());
+            } catch (Exception e) {
+                passwordMatches = false;
+            }
+        } else {
+            // Fallback for plain-text legacy passwords
+            passwordMatches = user.getPassword().equals(password);
+        }
+
+        if (!passwordMatches) {
             return ResponseEntity.badRequest().body("Invalid password");
         }
 
