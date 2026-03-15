@@ -1,0 +1,29 @@
+Service,Action,Endpoint Type,Endpoint Link
+Audit,Get All Audit Logs,GET,/api/audit
+Authentication,User Login,POST,/api/login
+Data Ingestion,Run Ingestion,POST,/api/ingestion/run
+Data Ingestion,Get All Batches,GET,/api/ingestion/batches
+Raw Records,Load Raw Records,POST,/api/raw-records/load/{batchId}
+Raw Records,Get Records By Batch,GET,/api/raw-records/batch/{batchId}
+Reporting,Generate Report,POST,/api/report/generate
+Reporting,Get Report,GET,/api/report/{id}
+Reporting,Submit Report,PUT,/api/report/{id}/submit
+Reporting,Approve Report,PUT,/api/report/{id}/approve
+Reporting,File Report,PUT,/api/report/{id}/file
+Risk Calculation,Get Metrics,GET,/api/risk/metrics
+Risk Calculation,Calculate Metrics,POST,/api/risk/calculate/{reportId}
+Source Data,Get All Loans,GET,/api/loans
+Source Data,Get All Deposits,GET,/api/deposits
+Source Data,Get All Treasury Trades,GET,/api/treasury
+Source Data,Get All General Ledgers,GET,/api/gl
+User Management,Get All Users,GET,/api/admin/users
+User Management,Create User,POST,/api/admin/users
+User Management,Update User,PUT,/api/admin/users/{id}
+User Management,Delete User,DELETE,/api/admin/users/{id}
+User Management,Toggle User Status,PATCH,/api/admin/users/{id}/status
+Validation,Run Validation,GET,/api/validation/run
+Validation,Get Validation Issues,GET,/api/validation/issues
+Validation,Get All Validation Rules,GET,/api/validation/rules
+Validation,Create Validation Rule,POST,/api/validation/rules
+Validation,Update Validation Rule,PUT,/api/validation/rules/{id}
+Validation,Delete Validation Rule,DELETE,/api/validation/rules/{id}
