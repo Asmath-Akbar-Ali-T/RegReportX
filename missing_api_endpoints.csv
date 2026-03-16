@@ -1,0 +1,22 @@
+Service,Action,Endpoint Type,Endpoint Link
+Identity & Access Management,Logout,POST,/api/logout
+Identity & Access Management,Get User Roles,GET,/api/users/me/roles
+Regulatory Templates,Get All Templates,GET,/api/templates
+Regulatory Templates,Create Template,POST,/api/templates
+Regulatory Templates,Get Template Fields,GET,/api/templates/{id}/fields
+Regulatory Templates,Save Template Fields,POST,/api/templates/{id}/fields
+Exceptions & Corrections,Get Active Exceptions,GET,/api/exceptions/active
+Exceptions & Corrections,Assign Exception,POST,/api/exceptions/{id}/assign
+Exceptions & Corrections,Correct Exception,POST,/api/exceptions/{id}/correct
+Exceptions & Corrections,Get Report Versions,GET,/api/reports/{id}/versions
+Notification & Alerts,Get User Notifications,GET,/api/notifications
+Notification & Alerts,Mark Notification as Read,PATCH,/api/notifications/{id}/read
+Audit & Evidence,Upload Evidence,POST,/api/reports/{id}/evidence
+Audit & Evidence,Get Evidence,GET,/api/reports/{id}/evidence
+Dashboards,Get Compliance Dashboard Stats,GET,/api/dashboard/compliance
+Dashboards,Get Risk Dashboard Stats,GET,/api/dashboard/risk
+Dashboards,Get Reporting Dashboard Stats,GET,/api/dashboard/reporting
+Data Ingestion,Upload Loans CSV,POST,/api/ingestion/upload/loans
+Data Ingestion,Upload Deposits CSV,POST,/api/ingestion/upload/deposits
+Data Ingestion,Upload Treasury CSV,POST,/api/ingestion/upload/treasury
+Data Ingestion,Upload GL CSV,POST,/api/ingestion/upload/gl
