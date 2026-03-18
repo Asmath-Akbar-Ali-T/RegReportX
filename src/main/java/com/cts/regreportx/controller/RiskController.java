@@ -1,14 +1,12 @@
 package com.cts.regreportx.controller;
 
+import com.cts.regreportx.dto.RiskMetricDto;
 import com.cts.regreportx.model.RiskMetric;
 import com.cts.regreportx.service.RiskCalculationService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,15 +18,25 @@ import java.util.stream.Collectors;
 public class RiskController {
 
     private final RiskCalculationService riskCalculationService;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public RiskController(RiskCalculationService riskCalculationService) {
+    public RiskController(RiskCalculationService riskCalculationService, ModelMapper modelMapper) {
         this.riskCalculationService = riskCalculationService;
+        this.modelMapper = modelMapper;
+    }
+
+    private RiskMetricDto convertToDto(RiskMetric metric) {
+        return modelMapper.map(metric, RiskMetricDto.class);
     }
 
     @GetMapping("/metrics")
-    public ResponseEntity<List<RiskMetric>> getMetrics() {
-        return ResponseEntity.ok(riskCalculationService.getAllMetrics());
+    public ResponseEntity<List<RiskMetricDto>> getMetrics() {
+        List<RiskMetricDto> dtoList = riskCalculationService.getAllMetrics()
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtoList);
     }
 
     @PostMapping("/calculate/{reportId}")

@@ -1,8 +1,10 @@
 package com.cts.regreportx.controller;
 
+import com.cts.regreportx.dto.UserDto;
 import com.cts.regreportx.model.User;
 import com.cts.regreportx.repository.UserRepository;
 import org.mindrot.jbcrypt.BCrypt;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,22 +12,31 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/admin/users")
 @CrossOrigin(origins = "*")
 public class UserController {
 
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
+
     @Autowired
-    private UserRepository userRepository;
+    public UserController(UserRepository userRepository, ModelMapper modelMapper) {
+        this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
+    }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userRepository.findAll());
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        return ResponseEntity.ok(userRepository.findAll().stream()
+                .map(u -> modelMapper.map(u, UserDto.class))
+                .collect(Collectors.toList()));
     }
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody User request) {
+    public ResponseEntity<?> createUser(@RequestBody UserDto request) {
         if (request.getEmail() == null || request.getPassword() == null || request.getRole() == null) {
             return ResponseEntity.badRequest().body("Missing required fields");
         }
@@ -35,7 +46,6 @@ public class UserController {
             return ResponseEntity.badRequest().body("User with this email already exists");
         }
 
-        // Hash the password
         String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
         
         User newUser = new User();
@@ -51,7 +61,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody User request) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDto request) {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -60,7 +70,6 @@ public class UserController {
         User user = userOptional.get();
         if (request.getName() != null) user.setName(request.getName());
         if (request.getEmail() != null) {
-            // Check if changing to an email that already exists
             Optional<User> emailCheck = userRepository.findByEmail(request.getEmail());
             if (emailCheck.isPresent() && !emailCheck.get().getId().equals(id)) {
                 return ResponseEntity.badRequest().body("Email already in use by another account");
@@ -68,7 +77,7 @@ public class UserController {
             user.setEmail(request.getEmail());
         }
         if (request.getRole() != null) user.setRole(request.getRole());
-        // For password updates through PUT, we'd hash it. Usually done via a separate endpoint, but left here if needed.
+        
         if (request.getPassword() != null && !request.getPassword().isEmpty() && !request.getPassword().startsWith("$2a$")) {
              user.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
         }
