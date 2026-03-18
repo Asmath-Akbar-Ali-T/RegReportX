@@ -24,11 +24,10 @@ public class ReportController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<RegReport> generateReport() {
-        // Mocking template and period
-        Integer mockTemplateId = 1;
-        String period = "2026-Q1";
-        RegReport report = reportingService.generateReport(mockTemplateId, period);
+    public ResponseEntity<RegReport> generateReport(
+            @RequestParam(required = false, defaultValue = "1") Integer templateId,
+            @RequestParam(required = false, defaultValue = "2026-Q1") String period) {
+        RegReport report = reportingService.generateReport(templateId, period);
         return ResponseEntity.ok(report);
     }
 
