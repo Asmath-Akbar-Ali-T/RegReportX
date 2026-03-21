@@ -1,8 +1,8 @@
 package com.cts.regreportx.config;
 
-import com.cts.regreportx.security.exception.CustomAccessDeniedHandler;
+import com.cts.regreportx.exception.CustomAccessDeniedHandler;
 import com.cts.regreportx.security.CustomUserDetailsService;
-import com.cts.regreportx.security.exception.JwtAuthenticationEntryPoint;
+import com.cts.regreportx.exception.JwtAuthenticationEntryPoint;
 import com.cts.regreportx.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

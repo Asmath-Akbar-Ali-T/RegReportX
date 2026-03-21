@@ -20,7 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RestController
 @RequestMapping("/api/admin/users")
 @CrossOrigin(origins = "*")
-@PreAuthorize("hasAnyRole('ADMIN', 'REGTECH_ADMIN')")
+@PreAuthorize("hasRole('REGTECH_ADMIN')")
 public class UserController {
 
     private final UserRepository userRepository;

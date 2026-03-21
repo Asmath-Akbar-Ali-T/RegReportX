@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api")
+@PreAuthorize("hasAnyRole('REGTECH_ADMIN', 'OPERATIONS_OFFICER')")
 public class SourceDataController {
 
     private final SourceDataService sourceDataService;

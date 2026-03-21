@@ -22,6 +22,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import com.cts.regreportx.exception.ResourceNotFoundException;
+import com.cts.regreportx.exception.ValidationException;
+
 @Service
 public class DataQualityService {
 
@@ -56,10 +59,10 @@ public class DataQualityService {
     @org.springframework.transaction.annotation.Transactional
     public java.util.Map<String, Object> resolveIssue(Integer issueId, DataQualityResolveRequest request) {
         DataQualityIssue issue = dataQualityIssueRepository.findById(issueId)
-                .orElseThrow(() -> new RuntimeException("Data Quality Issue not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Data Quality Issue not found"));
 
         if ("Resolved".equalsIgnoreCase(issue.getStatus())) {
-            throw new RuntimeException("Issue is already resolved");
+            throw new ValidationException("Issue is already resolved");
         }
 
         String finalPayloadJson = null;

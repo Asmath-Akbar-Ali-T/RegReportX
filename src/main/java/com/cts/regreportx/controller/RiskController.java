@@ -13,8 +13,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/risk")
+@PreAuthorize("hasAnyRole('RISK_ANALYST', 'REGTECH_ADMIN')")
 public class RiskController {
 
     private final RiskCalculationService riskCalculationService;

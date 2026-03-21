@@ -20,6 +20,7 @@ public class AppConfig {
     public CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         return args -> {
             if (userRepository.count() == 0) {
+                // 1. Dilip
                 User admin = new User();
                 admin.setName("DILIP");
                 admin.setUsername("Dilipkumar11");
@@ -27,9 +28,54 @@ public class AppConfig {
                 admin.setPassword(passwordEncoder.encode("1234@"));
                 admin.setRole("REGTECH_ADMIN");
                 admin.setStatus("ACTIVE");
-                admin.setCreatedAt(java.time.LocalDateTime.parse("2026-03-14T14:49:35.405"));
+                admin.setCreatedAt(java.time.LocalDateTime.now());
                 userRepository.save(admin);
-                System.out.println("Inserted default admin user (DILIP) with role REGTECH_ADMIN.");
+
+                // 2. Kishore
+                User kishore = new User();
+                kishore.setName("Kishore");
+                kishore.setUsername("Kishore");
+                kishore.setEmail("Kishore@cognizant.com");
+                kishore.setPassword(passwordEncoder.encode("1234@"));
+                kishore.setRole("COMPLIANCE_ANALYST");
+                kishore.setStatus("ACTIVE");
+                kishore.setCreatedAt(java.time.LocalDateTime.now());
+                userRepository.save(kishore);
+
+                // 3. Nandhana
+                User nandhana = new User();
+                nandhana.setName("Nandhana");
+                nandhana.setUsername("Nandhana");
+                nandhana.setEmail("Nandhana@cognizant.com");
+                nandhana.setPassword(passwordEncoder.encode("1234@"));
+                nandhana.setRole("RISK_ANALYST");
+                nandhana.setStatus("ACTIVE");
+                nandhana.setCreatedAt(java.time.LocalDateTime.now());
+                userRepository.save(nandhana);
+
+                // 4. Niranjana
+                User niranjana = new User();
+                niranjana.setName("Niranjana");
+                niranjana.setUsername("Niranjana");
+                niranjana.setEmail("Niranjana@cognizant.com");
+                niranjana.setPassword(passwordEncoder.encode("1234@"));
+                niranjana.setRole("REPORTING_OFFICER");
+                niranjana.setStatus("ACTIVE");
+                niranjana.setCreatedAt(java.time.LocalDateTime.now());
+                userRepository.save(niranjana);
+
+                // 5. Asmath
+                User asmath = new User();
+                asmath.setName("Asmath");
+                asmath.setUsername("Asmath");
+                asmath.setEmail("Asmath@cognizant.com");
+                asmath.setPassword(passwordEncoder.encode("1234@"));
+                asmath.setRole("OPERATIONS_OFFICER");
+                asmath.setStatus("ACTIVE");
+                asmath.setCreatedAt(java.time.LocalDateTime.now());
+                userRepository.save(asmath);
+
+                System.out.println("Inserted 5 default actors (Dilip, Kishore, Nandhana, Niranjana, Asmath).");
             }
         };
     }

@@ -16,6 +16,8 @@ import com.cts.regreportx.model.User;
 import com.cts.regreportx.model.TemplateField;
 import com.cts.regreportx.model.RiskMetric;
 import com.cts.regreportx.model.ReportVersion;
+import com.cts.regreportx.exception.ResourceNotFoundException;
+import com.cts.regreportx.exception.ValidationException;
 import com.cts.regreportx.dto.ExceptionResolveRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -122,10 +124,10 @@ public class ReportingService {
 
     private RegReport advanceWorkflow(Integer reportId, Integer actorId, String expectedCurrentStatus, String nextStatus) {
         RegReport report = reportRepository.findById(reportId)
-                .orElseThrow(() -> new RuntimeException("Report not found: " + reportId));
+                .orElseThrow(() -> new ResourceNotFoundException("Report not found: " + reportId));
         
         if (!expectedCurrentStatus.equals(report.getStatus())) {
-            throw new IllegalStateException("Cannot advance report to " + nextStatus + ". Current status is " + report.getStatus() + ", expected " + expectedCurrentStatus);
+            throw new ValidationException("Cannot advance report to " + nextStatus + ". Current status is " + report.getStatus() + ", expected " + expectedCurrentStatus);
         }
         
         report.setStatus(nextStatus);
@@ -170,10 +172,10 @@ public class ReportingService {
     @Transactional
     public ExceptionRecord resolveException(Integer exceptionId, ExceptionResolveRequest request) {
         ExceptionRecord exception = exceptionRecordRepository.findById(exceptionId)
-                .orElseThrow(() -> new RuntimeException("Exception Record not found: " + exceptionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Exception Record not found: " + exceptionId));
 
         if ("Resolved".equalsIgnoreCase(exception.getStatus())) {
-            throw new RuntimeException("Exception is already resolved");
+            throw new ValidationException("Exception is already resolved");
         }
 
         exception.setStatus("Resolved");

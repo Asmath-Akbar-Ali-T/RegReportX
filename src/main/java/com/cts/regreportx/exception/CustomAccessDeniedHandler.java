@@ -1,4 +1,4 @@
-package com.cts.regreportx.security.exception;
+package com.cts.regreportx.exception;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
