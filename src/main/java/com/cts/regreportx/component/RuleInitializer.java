@@ -18,22 +18,23 @@ public class RuleInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        insertRuleIfNotExists("LoanAmountPositive", "LoanAmount > 0", "ERROR", "Active");
-        insertRuleIfNotExists("InterestRateRange", "InterestRate BETWEEN 0 AND 20", "ERROR", "Active");
-        insertRuleIfNotExists("DepositAmountPositive", "Amount > 0", "ERROR", "Active");
-        insertRuleIfNotExists("DebitPositive", "Debit >= 0", "ERROR", "Active");
-        insertRuleIfNotExists("CreditPositive", "Credit >= 0", "ERROR", "Active");
+        upsertRule("LoanAmountPositive", "LoanAmount > 0", "CRITICAL", "Active");
+        upsertRule("InterestRateRange", "InterestRate BETWEEN 0 AND 20", "WARNING", "Active");
+        upsertRule("DepositAmountPositive", "Amount > 0", "CRITICAL", "Active");
+        upsertRule("DebitPositive", "Debit >= 0", "ERROR", "Active");
+        upsertRule("CreditPositive", "Credit >= 0", "ERROR", "Active");
     }
 
-    private void insertRuleIfNotExists(String name, String expression, String severity, String status) {
+    private void upsertRule(String name, String expression, String severity, String status) {
         ValidationRule rule = validationRuleRepository.findByName(name);
         if (rule == null) {
             rule = new ValidationRule();
             rule.setName(name);
-            rule.setRuleExpression(expression);
-            rule.setSeverity(severity);
-            rule.setStatus(status);
-            validationRuleRepository.save(rule);
         }
+        // Update values even if it already exists so we can fix the old "ERROR" severities
+        rule.setRuleExpression(expression);
+        rule.setSeverity(severity);
+        rule.setStatus(status);
+        validationRuleRepository.save(rule);
     }
 }

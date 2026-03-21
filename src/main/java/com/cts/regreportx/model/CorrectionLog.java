@@ -20,6 +20,9 @@ public class CorrectionLog {
     @Column(name = "ExceptionID")
     private Integer exceptionId;
 
+    @Column(name = "DataQualityIssueID")
+    private Integer dataQualityIssueId;
+
     @Column(name = "OldValue")
     private String oldValue;
 
@@ -49,6 +52,14 @@ public class CorrectionLog {
 
     public void setExceptionId(Integer exceptionId) {
         this.exceptionId = exceptionId;
+    }
+
+    public Integer getDataQualityIssueId() {
+        return dataQualityIssueId;
+    }
+
+    public void setDataQualityIssueId(Integer dataQualityIssueId) {
+        this.dataQualityIssueId = dataQualityIssueId;
     }
 
     public String getOldValue() {

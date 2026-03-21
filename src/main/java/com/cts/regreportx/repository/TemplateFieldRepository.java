@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface TemplateFieldRepository extends JpaRepository<TemplateField, Integer> {
     List<TemplateField> findByTemplateId(Integer templateId);
+    List<TemplateField> findByFieldName(String fieldName);
 }

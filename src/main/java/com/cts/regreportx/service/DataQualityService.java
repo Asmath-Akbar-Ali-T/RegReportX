@@ -1,0 +1,142 @@
+package com.cts.regreportx.service;
+
+import com.cts.regreportx.dto.DataQualityResolveRequest;
+import com.cts.regreportx.model.CorrectionLog;
+import com.cts.regreportx.model.DataQualityIssue;
+import com.cts.regreportx.model.RawRecord;
+import com.cts.regreportx.model.ValidationRule;
+import com.cts.regreportx.model.User;
+import com.cts.regreportx.repository.CorrectionLogRepository;
+import com.cts.regreportx.repository.DataQualityIssueRepository;
+import com.cts.regreportx.repository.RawRecordRepository;
+import com.cts.regreportx.repository.ValidationRuleRepository;
+import com.cts.regreportx.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class DataQualityService {
+
+    private final DataQualityIssueRepository dataQualityIssueRepository;
+    private final CorrectionLogRepository correctionLogRepository;
+    private final RawRecordRepository rawRecordRepository;
+    private final ValidationRuleRepository validationRuleRepository;
+    private final AuditService auditService;
+    private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
+
+    @Autowired
+    public DataQualityService(DataQualityIssueRepository dataQualityIssueRepository,
+                              CorrectionLogRepository correctionLogRepository,
+                              RawRecordRepository rawRecordRepository,
+                              ValidationRuleRepository validationRuleRepository,
+                              AuditService auditService,
+                              UserRepository userRepository) {
+        this.dataQualityIssueRepository = dataQualityIssueRepository;
+        this.correctionLogRepository = correctionLogRepository;
+        this.rawRecordRepository = rawRecordRepository;
+        this.validationRuleRepository = validationRuleRepository;
+        this.auditService = auditService;
+        this.userRepository = userRepository;
+        this.objectMapper = new ObjectMapper();
+    }
+
+    public List<DataQualityIssue> getOpenIssues() {
+        return dataQualityIssueRepository.findByStatus("Open");
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public java.util.Map<String, Object> resolveIssue(Integer issueId, DataQualityResolveRequest request) {
+        DataQualityIssue issue = dataQualityIssueRepository.findById(issueId)
+                .orElseThrow(() -> new RuntimeException("Data Quality Issue not found"));
+
+        if ("Resolved".equalsIgnoreCase(issue.getStatus())) {
+            throw new RuntimeException("Issue is already resolved");
+        }
+
+        String finalPayloadJson = null;
+
+        // 1. Update RawRecord Table
+        try {
+            Integer rawRecordId = Integer.parseInt(issue.getRecordId());
+            Optional<RawRecord> rawRecordOpt = rawRecordRepository.findById(rawRecordId);
+            
+            if (rawRecordOpt.isPresent()) {
+                RawRecord rawRecord = rawRecordOpt.get();
+                ValidationRule rule = validationRuleRepository.findById(issue.getRuleId()).orElse(null);
+                
+                if (rule != null) {
+                    // Extract field name from rule (e.g., "LoanAmount > 0" -> "LoanAmount")
+                    String fieldName = rule.getRuleExpression().split(" ")[0];
+                    String camelAttr = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
+
+                    ObjectNode jsonNode = (ObjectNode) objectMapper.readTree(rawRecord.getPayloadJson());
+                    
+                    // Update whichever casing exists in the JSON payload
+                    String cleanValue = request.getCorrectedValue() != null ? request.getCorrectedValue().trim() : "";
+                    try {
+                        java.math.BigDecimal numVal = new java.math.BigDecimal(cleanValue);
+                        if (jsonNode.has(camelAttr)) {
+                            jsonNode.put(camelAttr, numVal);
+                        } else {
+                            jsonNode.put(fieldName, numVal);
+                        }
+                    } catch (NumberFormatException nfe) {
+                        if (jsonNode.has(camelAttr)) {
+                            jsonNode.put(camelAttr, cleanValue);
+                        } else {
+                            jsonNode.put(fieldName, cleanValue);
+                        }
+                    }
+                    
+                    finalPayloadJson = jsonNode.toString();
+                    rawRecord.setPayloadJson(finalPayloadJson);
+                    rawRecordRepository.save(rawRecord);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to patch RawRecord: " + e.getMessage());
+            // Proceed to mark resolved even if raw patching fails to avoid strict deadlocks, 
+            // but log the error appropriately.
+        }
+
+        // 2. Mark issue as resolved
+        issue.setStatus("Resolved");
+        DataQualityIssue savedIssue = dataQualityIssueRepository.save(issue);
+
+        // 3. Create CorrectionLog
+        CorrectionLog log = new CorrectionLog();
+        log.setDataQualityIssueId(issue.getIssueId());
+        log.setOldValue(issue.getMessage());
+        log.setNewValue("Corrected to " + request.getCorrectedValue() + " | Reason: " + request.getJustification());
+        log.setCorrectedDate(LocalDateTime.now());
+        
+        // Use JWT authentication if available instead of hardcoding Admin
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+                Optional<User> userOpt = userRepository.findByUsername(auth.getName());
+                userOpt.ifPresent(user -> log.setCorrectedBy(user.getId().intValue()));
+            }
+        } catch (Exception e) {}
+        
+        correctionLogRepository.save(log);
+
+        // 4. Log to AuditLog
+        auditService.logAction("RESOLVED_DATA_QUALITY_ISSUE", "DataQualityIssue ID: " + issueId);
+
+        java.util.Map<String, Object> responseMap = new java.util.HashMap<>();
+        responseMap.put("issue", savedIssue);
+        responseMap.put("patchedRecordPayload", finalPayloadJson != null ? finalPayloadJson : "Failed to patch RawRecord JSON");
+
+        return responseMap;
+    }
+}

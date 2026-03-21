@@ -72,6 +72,12 @@ public class RiskCalculationService {
         BigDecimal totalDeposits = deposits.stream().map(d -> d.getAmount() != null ? d.getAmount() : BigDecimal.ZERO).reduce(BigDecimal.ZERO, BigDecimal::add);
         context.put("Total_Deposits", totalDeposits);
 
+        BigDecimal cdRatio = BigDecimal.ZERO;
+        if (totalDeposits.compareTo(BigDecimal.ZERO) > 0) {
+            cdRatio = totalLoans.divide(totalDeposits, 4, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
+        }
+        context.put("Loan_to_Deposit_Ratio", cdRatio);
+
         BigDecimal totalTreasury = treasuryTrades.stream().map(t -> t.getNotional() != null ? t.getNotional() : BigDecimal.ZERO).reduce(BigDecimal.ZERO, BigDecimal::add);
         context.put("Treasury_Exposure", totalTreasury);
 

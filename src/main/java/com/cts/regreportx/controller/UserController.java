@@ -6,6 +6,7 @@ import com.cts.regreportx.repository.UserRepository;
 import org.mindrot.jbcrypt.BCrypt;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,18 +15,23 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/admin/users")
 @CrossOrigin(origins = "*")
+@PreAuthorize("hasAnyRole('ADMIN', 'REGTECH_ADMIN')")
 public class UserController {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserController(UserRepository userRepository, ModelMapper modelMapper) {
+    public UserController(UserRepository userRepository, ModelMapper modelMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -46,9 +52,10 @@ public class UserController {
             return ResponseEntity.badRequest().body("User with this email already exists");
         }
 
-        String hashedPassword = BCrypt.hashpw(request.getPassword(), BCrypt.gensalt());
-        
+        String hashedPassword = passwordEncoder.encode(request.getPassword());
+
         User newUser = new User();
+        newUser.setUsername(request.getUsername());
         newUser.setName(request.getName());
         newUser.setEmail(request.getEmail());
         newUser.setPassword(hashedPassword);
@@ -68,7 +75,8 @@ public class UserController {
         }
 
         User user = userOptional.get();
-        if (request.getName() != null) user.setName(request.getName());
+        if (request.getName() != null)
+            user.setName(request.getName());
         if (request.getEmail() != null) {
             Optional<User> emailCheck = userRepository.findByEmail(request.getEmail());
             if (emailCheck.isPresent() && !emailCheck.get().getId().equals(id)) {
@@ -76,10 +84,16 @@ public class UserController {
             }
             user.setEmail(request.getEmail());
         }
-        if (request.getRole() != null) user.setRole(request.getRole());
-        
-        if (request.getPassword() != null && !request.getPassword().isEmpty() && !request.getPassword().startsWith("$2a$")) {
-             user.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
+        if (request.getRole() != null) {
+            user.setRole(request.getRole());
+        }
+        if (request.getUsername() != null) {
+            user.setUsername(request.getUsername());
+        }
+
+        if (request.getPassword() != null && !request.getPassword().isEmpty()
+                && !request.getPassword().startsWith("$2a$")) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
         userRepository.save(user);
@@ -113,6 +127,7 @@ public class UserController {
         }
 
         userRepository.save(user);
-        return ResponseEntity.ok(Map.of("message", "User status updated to " + user.getStatus(), "status", user.getStatus()));
+        return ResponseEntity
+                .ok(Map.of("message", "User status updated to " + user.getStatus(), "status", user.getStatus()));
     }
 }
