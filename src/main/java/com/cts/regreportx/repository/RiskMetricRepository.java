@@ -16,6 +16,5 @@ public interface RiskMetricRepository extends JpaRepository<RiskMetric, Integer>
     void deleteByReport_ReportId(Integer reportId);
     
     java.util.List<RiskMetric> findByReport_ReportId(Integer reportId);
-    
     java.util.Optional<RiskMetric> findByReport_ReportIdAndMetricName(Integer reportId, String metricName);
 }
